@@ -1,8 +1,17 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const morgan = require('morgan');
 require('dotenv').config();
+
+// 简单的请求日志中间件（替代 morgan，避免 Node.js v22 兼容性问题）
+const requestLogger = (req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`);
+  });
+  next();
+};
 
 // 创建Express应用
 const app = express();
@@ -13,7 +22,7 @@ const { apiLimiter } = require('./middlewares/rateLimit');
 // 中间件
 app.use(helmet()); // 安全相关的HTTP头
 app.use(cors()); // 跨域支持
-app.use(morgan('dev')); // 日志
+app.use(requestLogger); // 日志
 app.use('/api', apiLimiter); // API限流
 app.use(express.json()); // 解析JSON
 app.use(express.urlencoded({ extended: true })); // 解析URL编码

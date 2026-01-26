@@ -1,14 +1,26 @@
-const redis = require('../config/redis');
+const { redis, isAvailable } = require('../config/redis');
+
+// 内存缓存
+const memoryCache = new Map();
+const memoryCacheExpiry = new Map();
+
+// 清理过期缓存
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, expiry] of memoryCacheExpiry.entries()) {
+    if (expiry && expiry < now) {
+      memoryCache.delete(key);
+      memoryCacheExpiry.delete(key);
+    }
+  }
+}, 60000);
 
 /**
- * Redis缓存管理工具类
- * 提供统一的缓存操作接口
+ * 缓存管理工具类 - 支持 Redis 和内存缓存
  */
-
 class CacheManager {
   constructor() {
-    this.redis = redis;
-    this.defaultTTL = 3600; // 默认过期时间：1小时
+    this.defaultTTL = 3600;
   }
 
   /**
@@ -33,12 +45,21 @@ class CacheManager {
    */
   async get(key) {
     try {
-      const data = await this.redis.get(key);
-      if (!data) return null;
-      
-      return JSON.parse(data);
+      let data = null;
+      if (isAvailable() && redis) {
+        data = await redis.get(key);
+      } else {
+        const expiry = memoryCacheExpiry.get(key);
+        if (expiry && expiry < Date.now()) {
+          memoryCache.delete(key);
+          memoryCacheExpiry.delete(key);
+        } else {
+          data = memoryCache.get(key);
+        }
+      }
+      return data ? JSON.parse(data) : null;
     } catch (error) {
-      console.error('Redis GET错误:', error);
+      console.error('缓存GET错误:', error);
       return null;
     }
   }
@@ -53,16 +74,21 @@ class CacheManager {
   async set(key, value, ttl = this.defaultTTL) {
     try {
       const serialized = JSON.stringify(value);
-      
-      if (ttl > 0) {
-        await this.redis.setex(key, ttl, serialized);
+      if (isAvailable() && redis) {
+        if (ttl > 0) {
+          await redis.setex(key, ttl, serialized);
+        } else {
+          await redis.set(key, serialized);
+        }
       } else {
-        await this.redis.set(key, serialized);
+        memoryCache.set(key, serialized);
+        if (ttl > 0) {
+          memoryCacheExpiry.set(key, Date.now() + ttl * 1000);
+        }
       }
-      
       return true;
     } catch (error) {
-      console.error('Redis SET错误:', error);
+      console.error('缓存SET错误:', error);
       return false;
     }
   }
@@ -75,13 +101,24 @@ class CacheManager {
   async delete(keys) {
     try {
       if (!keys) return 0;
-      
       const keyArray = Array.isArray(keys) ? keys : [keys];
       if (keyArray.length === 0) return 0;
-      
-      return await this.redis.del(...keyArray);
+
+      if (isAvailable() && redis) {
+        return await redis.del(...keyArray);
+      } else {
+        let count = 0;
+        for (const key of keyArray) {
+          if (memoryCache.has(key)) {
+            memoryCache.delete(key);
+            memoryCacheExpiry.delete(key);
+            count++;
+          }
+        }
+        return count;
+      }
     } catch (error) {
-      console.error('Redis DELETE错误:', error);
+      console.error('缓存DELETE错误:', error);
       return 0;
     }
   }
@@ -93,12 +130,24 @@ class CacheManager {
    */
   async deletePattern(pattern) {
     try {
-      const keys = await this.redis.keys(pattern);
-      if (keys.length === 0) return 0;
-      
-      return await this.redis.del(...keys);
+      if (isAvailable() && redis) {
+        const keys = await redis.keys(pattern);
+        if (keys.length === 0) return 0;
+        return await redis.del(...keys);
+      } else {
+        const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+        let count = 0;
+        for (const key of memoryCache.keys()) {
+          if (regex.test(key)) {
+            memoryCache.delete(key);
+            memoryCacheExpiry.delete(key);
+            count++;
+          }
+        }
+        return count;
+      }
     } catch (error) {
-      console.error('Redis DELETE PATTERN错误:', error);
+      console.error('缓存DELETE PATTERN错误:', error);
       return 0;
     }
   }
@@ -110,10 +159,20 @@ class CacheManager {
    */
   async exists(key) {
     try {
-      const result = await this.redis.exists(key);
-      return result === 1;
+      if (isAvailable() && redis) {
+        const result = await redis.exists(key);
+        return result === 1;
+      } else {
+        const expiry = memoryCacheExpiry.get(key);
+        if (expiry && expiry < Date.now()) {
+          memoryCache.delete(key);
+          memoryCacheExpiry.delete(key);
+          return false;
+        }
+        return memoryCache.has(key);
+      }
     } catch (error) {
-      console.error('Redis EXISTS错误:', error);
+      console.error('缓存EXISTS错误:', error);
       return false;
     }
   }
@@ -126,10 +185,18 @@ class CacheManager {
    */
   async expire(key, ttl) {
     try {
-      const result = await this.redis.expire(key, ttl);
-      return result === 1;
+      if (isAvailable() && redis) {
+        const result = await redis.expire(key, ttl);
+        return result === 1;
+      } else {
+        if (memoryCache.has(key)) {
+          memoryCacheExpiry.set(key, Date.now() + ttl * 1000);
+          return true;
+        }
+        return false;
+      }
     } catch (error) {
-      console.error('Redis EXPIRE错误:', error);
+      console.error('缓存EXPIRE错误:', error);
       return false;
     }
   }
@@ -141,9 +208,17 @@ class CacheManager {
    */
   async ttl(key) {
     try {
-      return await this.redis.ttl(key);
+      if (isAvailable() && redis) {
+        return await redis.ttl(key);
+      } else {
+        const expiry = memoryCacheExpiry.get(key);
+        if (!memoryCache.has(key)) return -2;
+        if (!expiry) return -1;
+        const remaining = Math.ceil((expiry - Date.now()) / 1000);
+        return remaining > 0 ? remaining : -2;
+      }
     } catch (error) {
-      console.error('Redis TTL错误:', error);
+      console.error('缓存TTL错误:', error);
       return -2;
     }
   }
@@ -179,10 +254,15 @@ class CacheManager {
    */
   async clear() {
     try {
-      await this.redis.flushdb();
+      if (isAvailable() && redis) {
+        await redis.flushdb();
+      } else {
+        memoryCache.clear();
+        memoryCacheExpiry.clear();
+      }
       return true;
     } catch (error) {
-      console.error('Redis CLEAR错误:', error);
+      console.error('缓存CLEAR错误:', error);
       return false;
     }
   }
@@ -193,22 +273,28 @@ class CacheManager {
    */
   async stats() {
     try {
-      const info = await this.redis.info('stats');
-      const dbSize = await this.redis.dbsize();
-      
-      return {
-        dbSize,
-        info: info.split('\r\n').reduce((acc, line) => {
-          const [key, value] = line.split(':');
-          if (key && value) {
-            acc[key] = value;
-          }
-          return acc;
-        }, {})
-      };
+      if (isAvailable() && redis) {
+        const info = await redis.info('stats');
+        const dbSize = await redis.dbsize();
+        return {
+          dbSize,
+          type: 'redis',
+          info: info.split('\r\n').reduce((acc, line) => {
+            const [key, value] = line.split(':');
+            if (key && value) acc[key] = value;
+            return acc;
+          }, {})
+        };
+      } else {
+        return {
+          dbSize: memoryCache.size,
+          type: 'memory',
+          info: {}
+        };
+      }
     } catch (error) {
-      console.error('Redis STATS错误:', error);
-      return { dbSize: 0, info: {} };
+      console.error('缓存STATS错误:', error);
+      return { dbSize: 0, type: 'unknown', info: {} };
     }
   }
 

@@ -27,7 +27,11 @@ if (dbConfig.dialect === 'sqlite') {
       logging: dbConfig.logging,
       timezone: dbConfig.timezone,
       define: dbConfig.define,
-      pool: dbConfig.pool
+      pool: dbConfig.pool,
+      dialectOptions: {
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_unicode_ci'
+      }
     }
   );
 }

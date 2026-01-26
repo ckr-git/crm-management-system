@@ -1,7 +1,7 @@
 const app = require('./app');
 const config = require('./config');
 const { testConnection } = require('./models');
-const redis = require('./config/redis');
+const { isAvailable } = require('./config/redis');
 
 const PORT = config.app.port;
 
@@ -10,7 +10,7 @@ const startServer = async () => {
   try {
     // 测试数据库连接
     await testConnection();
-    
+
     // 启动HTTP服务器
     app.listen(PORT, () => {
       console.log('');
@@ -20,7 +20,7 @@ const startServer = async () => {
       console.log(`📡 服务地址: http://localhost:${PORT}`);
       console.log(`🌍 环境: ${config.app.env}`);
       console.log(`📊 数据库: MySQL ${process.env.DB_HOST}:${process.env.DB_PORT}`);
-      console.log(`💾 缓存: Redis ${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`);
+      console.log(`💾 缓存: ${isAvailable() ? 'Redis' : '内存缓存'}`);
       console.log('=================================');
       console.log('');
     });

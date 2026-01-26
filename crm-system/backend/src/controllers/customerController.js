@@ -200,7 +200,7 @@ exports.createCustomer = async (req, res) => {
       tags: tags ? JSON.parse(tags) : null,
       remark,
       owner_id: owner_id || req.user.id, // 默认为当前登录用户
-      next_followup_at
+      next_followup_at: next_followup_at || null  // 空字符串转为null
     });
 
     res.json({

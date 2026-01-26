@@ -28,6 +28,7 @@ yarn-error.log*
 dist/
 build/
 *.tgz
+storybook-static/
 
 # 测试覆盖率
 coverage/
@@ -37,6 +38,9 @@ coverage/
 *.tmp
 .cache/
 .temp/
+test-*.json
+test-*.md
+nul
 
 # 上传文件
 uploads/

@@ -1,7 +1,22 @@
 /**
- * 缓存工具类
+ * 缓存工具类 - 支持 Redis 和内存缓存
  */
-const redis = require('../config/redis');
+const { redis, isAvailable } = require('../config/redis');
+
+// 内存缓存
+const memoryCache = new Map();
+const memoryCacheExpiry = new Map();
+
+// 清理过期的内存缓存
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, expiry] of memoryCacheExpiry.entries()) {
+    if (expiry && expiry < now) {
+      memoryCache.delete(key);
+      memoryCacheExpiry.delete(key);
+    }
+  }
+}, 60000); // 每分钟清理一次
 
 class CacheUtil {
   /**
@@ -10,10 +25,20 @@ class CacheUtil {
   static async set(key, value, expire = 3600) {
     try {
       const data = JSON.stringify(value);
-      if (expire) {
-        await redis.setex(key, expire, data);
+
+      // 优先使用 Redis
+      if (isAvailable() && redis) {
+        if (expire) {
+          await redis.setex(key, expire, data);
+        } else {
+          await redis.set(key, data);
+        }
       } else {
-        await redis.set(key, data);
+        // 使用内存缓存
+        memoryCache.set(key, data);
+        if (expire) {
+          memoryCacheExpiry.set(key, Date.now() + expire * 1000);
+        }
       }
       return true;
     } catch (error) {
@@ -27,7 +52,21 @@ class CacheUtil {
    */
   static async get(key) {
     try {
-      const data = await redis.get(key);
+      let data = null;
+
+      if (isAvailable() && redis) {
+        data = await redis.get(key);
+      } else {
+        // 检查内存缓存是否过期
+        const expiry = memoryCacheExpiry.get(key);
+        if (expiry && expiry < Date.now()) {
+          memoryCache.delete(key);
+          memoryCacheExpiry.delete(key);
+        } else {
+          data = memoryCache.get(key);
+        }
+      }
+
       return data ? JSON.parse(data) : null;
     } catch (error) {
       console.error('获取缓存失败:', error);
@@ -40,7 +79,12 @@ class CacheUtil {
    */
   static async del(key) {
     try {
-      await redis.del(key);
+      if (isAvailable() && redis) {
+        await redis.del(key);
+      } else {
+        memoryCache.delete(key);
+        memoryCacheExpiry.delete(key);
+      }
       return true;
     } catch (error) {
       console.error('删除缓存失败:', error);
@@ -53,9 +97,20 @@ class CacheUtil {
    */
   static async delPattern(pattern) {
     try {
-      const keys = await redis.keys(pattern);
-      if (keys.length > 0) {
-        await redis.del(...keys);
+      if (isAvailable() && redis) {
+        const keys = await redis.keys(pattern);
+        if (keys.length > 0) {
+          await redis.del(...keys);
+        }
+      } else {
+        // 内存缓存模式匹配删除
+        const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+        for (const key of memoryCache.keys()) {
+          if (regex.test(key)) {
+            memoryCache.delete(key);
+            memoryCacheExpiry.delete(key);
+          }
+        }
       }
       return true;
     } catch (error) {

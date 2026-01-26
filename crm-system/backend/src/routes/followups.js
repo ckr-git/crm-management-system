@@ -3,6 +3,7 @@ const router = express.Router();
 const { body, query } = require('express-validator');
 const followupController = require('../controllers/followupController');
 const upload = require('../middleware/upload');
+const validate = require('../middlewares/validate');
 
 // 验证规则
 const createValidation = [
@@ -29,8 +30,8 @@ const listValidation = [
 ];
 
 // 路由
-router.get('/', listValidation, followupController.getFollowupList);
-router.post('/', createValidation, followupController.createFollowup);
+router.get('/', listValidation, validate, followupController.getFollowupList);
+router.post('/', createValidation, validate, followupController.createFollowup);
 router.get('/stats', followupController.getFollowupStats);
 router.get('/stats/user', followupController.getUserStats);
 router.get('/stats/team', followupController.getTeamStats);
@@ -40,7 +41,7 @@ router.get('/export', followupController.exportFollowups);
 router.get('/template', followupController.downloadFollowupTemplate);
 router.post('/import', upload.single('file'), followupController.importFollowups);
 router.get('/:id', followupController.getFollowupDetail);
-router.put('/:id', updateValidation, followupController.updateFollowup);
+router.put('/:id', updateValidation, validate, followupController.updateFollowup);
 router.delete('/:id', followupController.deleteFollowup);
 
 module.exports = router;
