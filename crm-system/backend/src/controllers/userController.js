@@ -458,8 +458,10 @@ exports.resetPassword = async (req, res) => {
     const { id } = req.params;
     const { new_password } = req.body;
 
-    // 如果未提供新密码，使用默认密码
-    const password = new_password || '123456';
+    if (!new_password) {
+      return res.status(400).json({ code: 400, message: '请提供新密码' });
+    }
+    const password = new_password;
 
     const user = await models.User.findByPk(id);
 

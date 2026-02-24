@@ -18,14 +18,14 @@ const authMiddleware = (req, res, next) => {
     }
 
     // 提取token（格式：Bearer <token>）
-    const token = authHeader.replace('Bearer ', '');
-    
-    if (!token) {
+    const parts = authHeader.split(' ');
+    if (parts.length !== 2 || parts[0] !== 'Bearer') {
       return res.status(401).json({
         code: 401,
         message: '认证令牌格式不正确'
       });
     }
+    const token = parts[1];
 
     // 验证token
     const decoded = jwt.verify(token, config.jwt.secret);
@@ -53,8 +53,7 @@ const authMiddleware = (req, res, next) => {
     
     return res.status(401).json({
       code: 401,
-      message: '认证失败',
-      error: error.message
+      message: '认证失败'
     });
   }
 };

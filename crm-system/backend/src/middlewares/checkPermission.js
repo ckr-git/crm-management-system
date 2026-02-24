@@ -62,8 +62,7 @@ const checkPermission = (permissionCode) => {
       console.error('权限检查错误:', error);
       res.status(500).json({
         code: 500,
-        message: '服务器错误',
-        error: error.message
+        message: '服务器错误'
       });
     }
   };
@@ -127,8 +126,7 @@ const checkAnyPermission = (permissionCodes) => {
       console.error('权限检查错误:', error);
       res.status(500).json({
         code: 500,
-        message: '服务器错误',
-        error: error.message
+        message: '服务器错误'
       });
     }
   };

@@ -1,0 +1,264 @@
+/**
+ * 主题变量定义
+ * 小清新风格 - CRM系统 v2.0
+ *
+ * 使用说明:
+ * - 所有颜色、尺寸、间距统一从这里引用
+ * - 变量命名遵循 BEM 规范
+ * - 与 docs/ui-design-spec.md 保持同步
+ */
+
+// ============================================================================
+// 色彩系统
+// ============================================================================
+
+// 品牌主色 - 清新绿
+$color-primary: #67C23A;
+$color-primary-light-1: #85CE61;
+$color-primary-light-2: #95D475;
+$color-primary-light-3: #A4DA89;
+$color-primary-light-4: #B3E19D;
+$color-primary-light-5: #C2E7B0;
+$color-primary-light-6: #D1EDC4;
+$color-primary-light-7: #E1F3D8;
+$color-primary-light-8: #F0F9EB;
+$color-primary-light-9: #F5FBF3;
+$color-primary-dark-1: #5DAF34;
+$color-primary-dark-2: #529B2E;
+
+// 辅助色 - 天空蓝
+$color-secondary: #409EFF;
+$color-secondary-light-1: #66B1FF;
+$color-secondary-light-2: #79BBFF;
+$color-secondary-light-3: #8CC5FF;
+$color-secondary-light-7: #D9ECFF;
+$color-secondary-light-8: #ECF5FF;
+$color-secondary-dark-1: #3A8EE6;
+
+// 功能色
+$color-success: #67C23A;
+$color-success-light: #E1F3D8;
+$color-success-lighter: #F0F9EB;
+$color-success-dark: #529B2E;
+
+$color-warning: #E6A23C;
+$color-warning-light: #FAECD8;
+$color-warning-lighter: #FDF6EC;
+$color-warning-dark: #B88230;
+
+$color-danger: #F56C6C;
+$color-danger-light: #FDE2E2;
+$color-danger-lighter: #FEF0F0;
+$color-danger-dark: #C45656;
+
+$color-info: #909399;
+$color-info-light: #E9E9EB;
+$color-info-lighter: #F4F4F5;
+$color-info-dark: #73767A;
+
+// 中性色 - 文字
+$color-text-primary: #303133;     // 主要文字
+$color-text-regular: #606266;     // 常规文字
+$color-text-secondary: #909399;   // 次要文字
+$color-text-placeholder: #C0C4CC; // 占位文字
+$color-text-disabled: #C0C4CC;    // 禁用文字
+
+// 中性色 - 边框
+$color-border-base: #DCDFE6;          // 基础边框
+$color-border-light: #E4E7ED;         // 浅色边框
+$color-border-lighter: #EBEEF5;       // 更浅边框
+$color-border-extra-light: #F2F6FC;   // 极浅边框
+
+// 中性色 - 背景
+$color-bg-page: #F5F7FA;              // 页面背景
+$color-bg-card: #FFFFFF;              // 卡片背景
+$color-bg-overlay: rgba(0, 0, 0, 0.5); // 遮罩背景
+$color-bg-disabled: #F5F7FA;          // 禁用背景
+
+// 基础颜色
+$color-white: #FFFFFF;                // 白色
+$color-black: #000000;                // 黑色
+
+// ============================================================================
+// 字体系统
+// ============================================================================
+
+// 字体族
+$font-family-base: -apple-system, BlinkMacSystemFont, 'PingFang SC',
+  'Helvetica Neue', 'Segoe UI', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+$font-family-code: 'SF Mono', Monaco, 'Cascadia Code', 'Courier New', monospace;
+
+// 字体大小
+$font-size-extra-large: 24px;   // 大标题
+$font-size-large: 20px;         // 中标题
+$font-size-medium: 18px;        // 小标题
+$font-size-base: 14px;          // 基础正文 (默认)
+$font-size-small: 13px;         // 小号正文
+$font-size-extra-small: 12px;   // 辅助文字
+
+// 字体大小别名 (兼容旧命名)
+$font-size-xl: $font-size-extra-large;
+$font-size-lg: $font-size-large;
+$font-size-md: $font-size-medium;
+$font-size-sm: $font-size-small;
+$font-size-xs: $font-size-extra-small;
+
+// 字重
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;  // 别名,与bold相同
+$font-weight-bold: 600;
+
+// 行高
+$line-height-tight: 1.2;
+$line-height-base: 1.5;
+$line-height-relaxed: 1.6;
+$line-height-loose: 1.8;
+
+// ============================================================================
+// 圆角系统
+// ============================================================================
+
+$border-radius-small: 4px;    // 小元素 (标签、徽章)
+$border-radius-base: 6px;     // 基础元素 (按钮、输入框)
+$border-radius-medium: 8px;   // 中等元素 (小卡片)
+$border-radius-large: 12px;   // 大元素 (卡片、对话框)
+$border-radius-card: 12px;    // 卡片圆角 (别名,与large相同)
+$border-radius-round: 50%;    // 圆形 (头像)
+$border-radius-circle: 999px; // 胶囊型
+
+// ============================================================================
+// 阴影系统
+// ============================================================================
+
+$box-shadow-light: 0 2px 4px rgba(0, 0, 0, 0.04);    // 轻微阴影
+$box-shadow-base: 0 2px 12px rgba(0, 0, 0, 0.08);    // 基础阴影
+$box-shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.12);  // 中等阴影
+$box-shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.16);   // 重阴影
+$box-shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.06); // 内阴影
+$box-shadow-focus: 0 0 0 3px rgba(103, 194, 58, 0.2);   // 聚焦阴影
+
+// ============================================================================
+// 间距系统 (8px 栅格)
+// ============================================================================
+
+$spacing-xxs: 2px;
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-xxl: 48px;
+
+// ============================================================================
+// 组件尺寸
+// ============================================================================
+
+// 按钮
+$button-height-large: 40px;
+$button-height-default: 32px;
+$button-height-small: 28px;
+$button-padding-large: 12px 20px;
+$button-padding-default: 8px 16px;
+$button-padding-small: 6px 12px;
+
+// 输入框
+$input-height-large: 40px;
+$input-height-default: 32px;
+$input-height-small: 28px;
+$input-padding: 0 12px;
+
+// 卡片
+$card-padding-base: 20px;
+$card-padding-small: 16px;
+$card-padding-large: 24px;
+
+// 对话框
+$dialog-header-padding: 20px 24px;
+$dialog-body-padding: 24px;
+$dialog-footer-padding: 16px 24px;
+
+// 表格
+$table-header-height: 48px;
+$table-row-height: 48px;
+$table-cell-padding: 12px 16px;
+
+// ============================================================================
+// Z-index层级
+// ============================================================================
+
+$z-index-base: 1;
+$z-index-dropdown: 1000;
+$z-index-sticky: 1010;
+$z-index-fixed: 1020;
+$z-index-modal-backdrop: 1030;
+$z-index-modal: 1040;
+$z-index-popover: 1050;
+$z-index-tooltip: 1060;
+$z-index-notification: 1070;
+$z-index-message: 1080;
+
+// ============================================================================
+// 过渡动画
+// ============================================================================
+
+$transition-duration-fast: 0.15s;
+$transition-duration-base: 0.3s;
+$transition-duration-slow: 0.5s;
+
+$transition-timing-ease-in: cubic-bezier(0.4, 0, 1, 1);
+$transition-timing-ease-out: cubic-bezier(0, 0, 0.2, 1);
+$transition-timing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+$transition-base: all $transition-duration-base $transition-timing-ease-in-out;
+$transition-fade: opacity $transition-duration-base $transition-timing-ease-in-out;
+$transition-transform: transform $transition-duration-base $transition-timing-ease-in-out;
+
+// ============================================================================
+// 响应式断点
+// ============================================================================
+
+$breakpoint-mobile: 640px;    // < 640px: 手机
+$breakpoint-tablet: 1024px;   // 640px - 1024px: 平板
+$breakpoint-desktop: 1024px;  // >= 1024px: 桌面
+$breakpoint-wide: 1440px;     // >= 1440px: 宽屏
+$breakpoint-ultra-wide: 1920px; // >= 1920px: 超宽屏
+
+// ============================================================================
+// 容器最大宽度
+// ============================================================================
+
+$container-sm: 640px;
+$container-md: 768px;
+$container-lg: 1024px;
+$container-xl: 1280px;
+$container-2xl: 1600px;
+
+// ============================================================================
+// 图标尺寸
+// ============================================================================
+
+$icon-size-small: 14px;
+$icon-size-base: 16px;
+$icon-size-medium: 20px;
+$icon-size-large: 24px;
+$icon-size-extra-large: 32px;
+
+// ============================================================================
+// 表单相关
+// ============================================================================
+
+$form-label-width: 100px;
+$form-item-margin-bottom: 16px;
+$form-required-color: $color-danger;
+
+// ============================================================================
+// 状态颜色
+// ============================================================================
+
+$state-hover-bg: #F5F7FA;
+$state-hover-border: #C0C4CC;
+$state-active-bg: #E1F3D8;
+$state-active-border: $color-primary;
+$state-disabled-bg: #F5F7FA;
+$state-disabled-color: #C0C4CC;

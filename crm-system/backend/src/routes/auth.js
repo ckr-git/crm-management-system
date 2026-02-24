@@ -5,14 +5,6 @@ const { body } = require('express-validator');
 const authMiddleware = require('../middlewares/auth');
 const { loginLimiter } = require('../middlewares/rateLimit');
 
-// 调试中间件
-router.use((req, res, next) => {
-  console.log('=== Auth路由收到请求 ===');
-  console.log('路径:', req.path);
-  console.log('方法:', req.method);
-  next();
-});
-
 /**
  * @route   POST /api/auth/login
  * @desc    用户登录
@@ -28,14 +20,14 @@ router.post('/login', loginLimiter, [
  * @desc    获取用户信息
  * @access  Private
  */
-router.get('/userinfo', authController.getUserInfo);
+router.get('/userinfo', authMiddleware, authController.getUserInfo);
 
 /**
  * @route   POST /api/auth/logout
  * @desc    用户登出
  * @access  Private
  */
-router.post('/logout', authController.logout);
+router.post('/logout', authMiddleware, authController.logout);
 
 /**
  * @route   GET /api/auth/refresh-permissions

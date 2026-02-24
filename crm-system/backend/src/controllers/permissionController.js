@@ -156,8 +156,7 @@ exports.getPermissions = async (req, res) => {
     console.error('获取权限列表错误:', error);
     res.status(500).json({
       code: 500,
-      message: '服务器错误',
-      error: error.message
+      message: '服务器错误'
     });
   }
 };
@@ -168,7 +167,6 @@ exports.getPermissions = async (req, res) => {
 exports.getRolePermissions = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log('🔍 获取角色权限, role_id:', id);
 
     // 获取角色信息及其权限
     const role = await models.Role.findByPk(id, {
@@ -181,19 +179,14 @@ exports.getRolePermissions = async (req, res) => {
     });
 
     if (!role) {
-      console.log('❌ 角色不存在:', id);
       return res.status(404).json({
         code: 404,
         message: '角色不存在'
       });
     }
 
-    console.log('✅ 找到角色:', role.name);
-    console.log('权限关联数据:', role.permissions);
-
     // 提取权限ID数组
     const permissionIds = role.permissions ? role.permissions.map(p => p.id) : [];
-    console.log('权限ID数组:', permissionIds);
 
     res.json({
       code: 200,
@@ -201,13 +194,10 @@ exports.getRolePermissions = async (req, res) => {
       data: permissionIds
     });
   } catch (error) {
-    console.error('❌❌❌ 获取角色权限错误 ❌❌❌');
-    console.error('错误消息:', error.message);
-    console.error('错误堆栈:', error.stack);
+    console.error('获取角色权限错误:', error);
     res.status(500).json({
       code: 500,
-      message: '服务器错误',
-      error: error.message
+      message: '服务器错误'
     });
   }
 };
@@ -220,23 +210,18 @@ exports.updateRolePermissions = async (req, res) => {
     if (!requireAdmin(req, res)) return;
     const { id } = req.params;
     const { permission_ids } = req.body;
-    console.log('📝 更新角色权限, role_id:', id, 'permission_ids:', permission_ids);
 
     // 获取角色信息
     const role = await models.Role.findByPk(id);
     if (!role) {
-      console.log('❌ 角色不存在:', id);
       return res.status(404).json({
         code: 404,
         message: '角色不存在'
       });
     }
 
-    console.log('✅ 找到角色:', role.name);
-
     // 系统角色（管理员）不允许修改权限
     if (role.id === 1 && role.is_system === 1) {
-      console.log('❌ 系统管理员角色不可修改');
       return res.status(400).json({
         code: 400,
         message: '系统管理员角色权限不可修改'
@@ -245,14 +230,12 @@ exports.updateRolePermissions = async (req, res) => {
 
     // 验证权限ID
     if (!Array.isArray(permission_ids)) {
-      console.log('❌ 权限ID不是数组');
       return res.status(400).json({
         code: 400,
         message: '权限ID必须是数组'
       });
     }
 
-    console.log('🗑️  删除旧的权限关联...');
     // 删除旧的权限关联
     await models.RolePermission.destroy({
       where: { role_id: id }
@@ -260,15 +243,12 @@ exports.updateRolePermissions = async (req, res) => {
 
     // 创建新的权限关联
     if (permission_ids.length > 0) {
-      console.log('\u27a1\ufe0f 创建新的权限关联...');
       const rolePermissions = permission_ids.map(permId => ({
         role_id: parseInt(id),
         permission_id: parseInt(permId)
       }));
       
-      console.log('数据:', rolePermissions);
       await models.RolePermission.bulkCreate(rolePermissions);
-      console.log('\u2705 权限关联创建成功');
     }
 
     // 发送通知给使用该角色的用户
@@ -284,8 +264,6 @@ exports.updateRolePermissions = async (req, res) => {
       const operatorName = req.user?.name || req.user?.username || '管理员';
       
       if (affectedUsers.length > 0) {
-        console.log(`\ud83d\udd14 发送权限更新通知给 ${affectedUsers.length} 个用户`);
-        
         const notifications = affectedUsers.map(user => ({
           user_id: user.id,
           type: 'system',
@@ -302,7 +280,6 @@ exports.updateRolePermissions = async (req, res) => {
         }));
         
         await models.Notification.bulkCreate(notifications);
-        console.log('\u2705 权限更新通知发送成功');
       }
     } catch (notifyError) {
       console.error('发送权限更新通知失败:', notifyError);
@@ -318,14 +295,10 @@ exports.updateRolePermissions = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌❌❌ 更新角色权限错误 ❌❌❌');
-    console.error('错误消息:', error.message);
-    console.error('错误堆栈:', error.stack);
-    console.error('请求数据:', { id: req.params.id, body: req.body });
+    console.error('更新角色权限错误:', error);
     res.status(500).json({
       code: 500,
-      message: '服务器错误',
-      error: error.message
+      message: '服务器错误'
     });
   }
 };

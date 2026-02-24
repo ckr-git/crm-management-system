@@ -61,8 +61,10 @@ exports.getOpportunities = async (req, res) => {
 // 创建销售机会
 exports.createOpportunity = async (req, res) => {
   try {
+    const { customer_id, name, amount, stage, probability, expected_close_date, product, competitor, description } = req.body;
     const opportunity = await models.Opportunity.create({
-      ...req.body,
+      customer_id, name, amount, stage, probability,
+      expected_close_date, product, competitor, description,
       owner_id: req.body.owner_id || req.user.id
     });
 
@@ -329,8 +331,7 @@ exports.getFunnel = async (req, res) => {
       ? Math.round((wonCount / initialCount) * 100) 
       : 0;
 
-    console.log('漏斗数据:', JSON.stringify({ funnel, avgCycleDays, overallConversionRate }, null, 2));
-    res.json({ 
+    res.json({
       code: 200, 
       message: '获取成功', 
       data: { 

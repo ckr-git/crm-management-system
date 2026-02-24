@@ -1,0 +1,19 @@
+/**
+ * 样式统一入口
+ * 按顺序导入所有样式模块
+ */
+
+// 1. 主题变量 (最先导入，供其他模块使用)
+@import './theme/variables.scss';
+
+// 2. 工具 Mixins
+@import './theme/mixins.scss';
+
+// 3. 基础样式重置
+@import './base.scss';
+
+// 4. Element Plus 主题覆写
+@import './theme/element-plus.scss';
+
+// 5. 响应式样式 (保留现有的 responsive.css)
+// 注意: responsive.css 将在 main.ts 中单独引入,因为它是纯 CSS

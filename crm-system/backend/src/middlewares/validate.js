@@ -11,12 +11,10 @@ const validate = (req, res, next) => {
   if (!errors.isEmpty()) {
     const firstError = errors.array()[0];
     
-    // 记录详细的验证错误日志
+    // 记录验证错误日志（不记录body，避免泄露密码等敏感数据）
     console.error('验证失败:', {
       path: req.path,
       method: req.method,
-      query: req.query,
-      body: req.body,
       errors: errors.array()
     });
     

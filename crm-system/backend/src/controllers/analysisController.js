@@ -167,7 +167,7 @@ exports.getSourceConversion = async (req, res) => {
     // 获取有赢单机会的客户ID集合
     const wonOpportunities = await models.Opportunity.findAll({
       where: {
-        stage: 'closed_won'
+        status: 'won'
       },
       attributes: ['customer_id'],
       group: ['customer_id'],
@@ -329,9 +329,9 @@ exports.getIndustryComparison = async (req, res) => {
         industryData[industry].opportunity_count += customer.opportunities.length;
         
         customer.opportunities.forEach(opp => {
-          if (opp.stage === 'closed_won') {
+          if (opp.status === 'won') {
             industryData[industry].won_count++;
-            industryData[industry].total_amount += parseFloat(opp.amount || 0);
+            industryData[industry].total_amount += parseFloat(opp.actual_amount || opp.amount || 0);
           }
         });
       }
@@ -546,14 +546,14 @@ exports.getUserPerformance = async (req, res) => {
           owner_id: user.id,
           ...opportunityWhere
         },
-        attributes: ['stage', 'amount'],
+        attributes: ['stage', 'status', 'amount', 'actual_amount'],
         raw: true
       });
 
       const opportunityCount = opportunities.length;
-      const wonOpportunities = opportunities.filter(o => o.stage === 'closed_won');
+      const wonOpportunities = opportunities.filter(o => o.status === 'won');
       const wonCount = wonOpportunities.length;
-      const totalAmount = wonOpportunities.reduce((sum, o) => sum + parseFloat(o.amount || 0), 0);
+      const totalAmount = wonOpportunities.reduce((sum, o) => sum + parseFloat(o.actual_amount || o.amount || 0), 0);
 
       // 转化率：基于客户总数的成交转化
       const conversionRate = customerCount > 0 

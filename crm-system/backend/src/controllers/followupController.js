@@ -119,12 +119,12 @@ exports.createFollowup = async (req, res) => {
     // 创建跟进记录
     const followup = await models.Followup.create({
       customer_id,
-      user_id: req.user.id, // 从JWT token中获取当前用户ID
+      user_id: req.user.id,
       type,
       content,
-      result,
-      next_plan,
-      next_followup_at,
+      result: result || null,
+      next_plan: next_plan || null,
+      next_followup_at: next_followup_at || null,
       attachments
     });
 
@@ -254,9 +254,9 @@ exports.updateFollowup = async (req, res) => {
     await followup.update({
       type: type || followup.type,
       content: content || followup.content,
-      result,
-      next_plan,
-      next_followup_at,
+      result: result || null,
+      next_plan: next_plan || null,
+      next_followup_at: next_followup_at || null,
       attachments
     });
 
@@ -551,14 +551,8 @@ exports.getUserStats = async (req, res) => {
       where.created_at = {
         [Op.between]: [new Date(startDate), new Date(endDate)]
       };
-    } else {
-      // 默认最近30天
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      where.created_at = {
-        [Op.gte]: thirtyDaysAgo
-      };
     }
+    // 不传日期时查询全部数据，避免种子数据超出默认范围导致统计为0
 
     // 总跟进次数
     const totalCount = await models.Followup.count({ where });
@@ -640,14 +634,8 @@ exports.getTeamStats = async (req, res) => {
       where.created_at = {
         [Op.between]: [new Date(startDate), new Date(endDate)]
       };
-    } else {
-      // 默认最近30天
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      where.created_at = {
-        [Op.gte]: thirtyDaysAgo
-      };
     }
+    // 不传日期时查询全部数据
 
     // 获取所有跟进记录
     const followups = await models.Followup.findAll({

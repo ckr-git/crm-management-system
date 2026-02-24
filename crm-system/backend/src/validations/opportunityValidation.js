@@ -127,7 +127,7 @@ const getOpportunitiesValidation = [
   
   query('pageSize')
     .optional()
-    .isInt({ min: 1, max: 10000 }).withMessage('每页数量必须在1-10000之间'),
+    .isInt({ min: 1, max: 100 }).withMessage('每页数量必须在1-100之间'),
   
   query('name')
     .optional({ checkFalsy: true })

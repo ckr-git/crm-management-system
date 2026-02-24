@@ -10,7 +10,7 @@ const { checkPermission } = require('../middlewares/checkPermission');
  */
 
 // 获取用户列表（分页、搜索）- 需要用户管理权限
-router.get('/', checkPermission('user:list'), userController.getUsers);
+router.get('/', checkPermission('user:read'), userController.getUsers);
 
 // 获取可用用户列表（用于下拉选择）
 router.get('/available', userController.getAvailableUsers);
@@ -19,7 +19,7 @@ router.get('/available', userController.getAvailableUsers);
 router.get('/current', userController.getCurrentUser);
 
 // 获取用户详情 - 需要用户查看权限
-router.get('/:id', checkPermission('user:view'), userController.getUserById);
+router.get('/:id', checkPermission('user:read'), userController.getUserById);
 
 // 创建用户 - 需要用户创建权限
 router.post('/', 

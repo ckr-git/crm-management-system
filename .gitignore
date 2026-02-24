@@ -31,9 +31,13 @@ uploads/
 temp/
 
 # Database
-*.sql
 *.sqlite
 *.db
+
+# Claude Code
+.claude/
+.mcp.json
+nul
 
 # Logs
 logs/

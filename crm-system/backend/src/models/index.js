@@ -64,6 +64,7 @@ const Workflow = require('./Workflow')(sequelize);
 const WorkflowInstance = require('./WorkflowInstance')(sequelize);
 const WorkflowTask = require('./WorkflowTask')(sequelize);
 const SystemConfig = require('./SystemConfig')(sequelize);
+const OpportunityStageHistory = require('./OpportunityStageHistory')(sequelize);
 
 // 定义关联关系
 const setupAssociations = () => {
@@ -279,6 +280,24 @@ const setupAssociations = () => {
     foreignKey: 'assignee_id',
     as: 'assignee'
   });
+
+  // OpportunityStageHistory belongsTo Opportunity
+  OpportunityStageHistory.belongsTo(Opportunity, {
+    foreignKey: 'opportunity_id',
+    as: 'opportunity'
+  });
+
+  // OpportunityStageHistory belongsTo User (operator)
+  OpportunityStageHistory.belongsTo(User, {
+    foreignKey: 'changed_by',
+    as: 'operator'
+  });
+
+  // Opportunity hasMany OpportunityStageHistory
+  Opportunity.hasMany(OpportunityStageHistory, {
+    foreignKey: 'opportunity_id',
+    as: 'stageHistory'
+  });
 };
 
 setupAssociations();
@@ -301,6 +320,7 @@ module.exports = {
     Workflow,
     WorkflowInstance,
     WorkflowTask,
-    SystemConfig
+    SystemConfig,
+    OpportunityStageHistory
   }
 };

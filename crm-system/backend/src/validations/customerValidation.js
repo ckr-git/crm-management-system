@@ -151,7 +151,7 @@ const transferCustomerValidation = [
  * 批量操作验证
  */
 const batchOperationValidation = [
-  body('ids')
+  body('customer_ids')
     .isArray({ min: 1 }).withMessage('请至少选择一个客户')
     .custom((value) => {
       if (!value.every(id => Number.isInteger(id) && id > 0)) {

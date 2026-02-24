@@ -13,13 +13,13 @@ const createValidation = [
     .isIn(['phone', 'visit', 'email', 'wechat']).withMessage('跟进方式不正确'),
   body('content').notEmpty().withMessage('跟进内容不能为空')
     .isLength({ min: 10 }).withMessage('跟进内容不能少于10个字符'),
-  body('next_followup_at').optional().isISO8601().withMessage('下次跟进时间格式不正确')
+  body('next_followup_at').optional({ checkFalsy: true }).isISO8601().withMessage('下次跟进时间格式不正确')
 ];
 
 const updateValidation = [
   body('type').optional().isIn(['phone', 'visit', 'email', 'wechat']).withMessage('跟进方式不正确'),
   body('content').optional().isLength({ min: 10 }).withMessage('跟进内容不能少于10个字符'),
-  body('next_followup_at').optional().isISO8601().withMessage('下次跟进时间格式不正确')
+  body('next_followup_at').optional({ checkFalsy: true }).isISO8601().withMessage('下次跟进时间格式不正确')
 ];
 
 const listValidation = [
