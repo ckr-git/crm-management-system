@@ -14,6 +14,7 @@
     "build-storybook": "storybook build"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@storybook/addon-docs": "^9.1.13",
     "@storybook/addon-onboarding": "^9.1.13",
     "@storybook/vue3-vite": "^9.1.13",
