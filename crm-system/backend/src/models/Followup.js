@@ -65,19 +65,19 @@ module.exports = (sequelize) => {
     comment: '跟进记录表',
     indexes: [
       {
-        name: 'idx_customer_id',
+        name: 'idx_followups_customer_id',
         fields: ['customer_id']
       },
       {
-        name: 'idx_user_id',
+        name: 'idx_followups_user_id',
         fields: ['user_id']
       },
       {
-        name: 'idx_type',
+        name: 'idx_followups_type',
         fields: ['type']
       },
       {
-        name: 'idx_created_at',
+        name: 'idx_followups_created_at',
         fields: ['created_at']
       }
     ]

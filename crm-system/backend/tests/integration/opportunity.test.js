@@ -1,17 +1,9 @@
 const request = require('supertest');
 const app = require('../../src/app');
-const { createTestDatabase, syncTestDatabase, cleanTestDatabase, createTestUser, createTestCustomer, createTestOpportunity } = require('../helpers/testDatabase');
-const Opportunity = require('../../src/models/Opportunity');
-const Customer = require('../../src/models/Customer');
-const User = require('../../src/models/User');
-const Role = require('../../src/models/Role');
+const { createTestDatabase, syncTestDatabase, cleanTestDatabase, createTestUser, createTestCustomer, createTestOpportunity, models } = require('../helpers/testDatabase');
 
 describe('Opportunity Controller - 销售机会模块测试', () => {
   let sequelize;
-  let OpportunityModel;
-  let CustomerModel;
-  let UserModel;
-  let RoleModel;
   let testUser;
   let testCustomer;
   let testOpportunity;
@@ -20,30 +12,18 @@ describe('Opportunity Controller - 销售机会模块测试', () => {
   beforeAll(async () => {
     // 创建测试数据库
     sequelize = createTestDatabase();
-    OpportunityModel = Opportunity(sequelize);
-    CustomerModel = Customer(sequelize);
-    UserModel = User(sequelize);
-    RoleModel = Role(sequelize);
-
-    // 建立模型关联
-    OpportunityModel.belongsTo(CustomerModel, { foreignKey: 'customer_id', as: 'customer' });
-    OpportunityModel.belongsTo(UserModel, { foreignKey: 'owner_id', as: 'owner' });
-    CustomerModel.hasMany(OpportunityModel, { foreignKey: 'customer_id', as: 'opportunities' });
-    CustomerModel.belongsTo(UserModel, { foreignKey: 'owner_id', as: 'owner' });
-    UserModel.hasMany(OpportunityModel, { foreignKey: 'owner_id', as: 'opportunities' });
-    UserModel.belongsTo(RoleModel, { foreignKey: 'role_id', as: 'role' });
 
     await syncTestDatabase(sequelize);
 
     // 创建测试角色
-    const testRole = await RoleModel.create({
+    const testRole = await models.Role.create({
       id: 1,
       name: '销售',
       code: 'sales'
     });
 
     // 创建测试用户
-    testUser = await createTestUser(UserModel, {
+    testUser = await createTestUser(models.User, {
       username: 'salesuser',
       password: 'test123456',
       role_id: testRole.id
@@ -59,10 +39,10 @@ describe('Opportunity Controller - 销售机会模块测试', () => {
     token = loginResponse.body.data.token;
 
     // 创建测试客户
-    testCustomer = await createTestCustomer(CustomerModel, testUser.id);
+    testCustomer = await createTestCustomer(models.Customer, testUser.id);
 
     // 创建测试销售机会
-    testOpportunity = await createTestOpportunity(OpportunityModel, testCustomer.id, testUser.id);
+    testOpportunity = await createTestOpportunity(models.Opportunity, testCustomer.id, testUser.id);
   });
 
   afterAll(async () => {
@@ -190,7 +170,7 @@ describe('Opportunity Controller - 销售机会模块测试', () => {
   describe('GET /api/opportunities/funnel - 获取销售漏斗数据', () => {
     test('应该返回销售漏斗数据', async () => {
       const response = await request(app)
-        .get('/api/opportunities/funnel')
+        .get('/api/opportunities/stats/funnel')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
@@ -240,21 +220,21 @@ describe('Opportunity Controller - 销售机会模块测试', () => {
         .send({ stage: 'invalid_stage' })
         .expect(400);
 
-      expect(response.body).toHaveProperty('code', 400);
+      expect(response.body).toHaveProperty('code', 1001);
     });
   });
 
   describe('PUT /api/opportunities/:id/win - 标记赢单', () => {
     test('应该成功标记赢单', async () => {
       // 创建一个新的销售机会用于赢单测试
-      const oppForWin = await createTestOpportunity(OpportunityModel, testCustomer.id, testUser.id, {
+      const oppForWin = await createTestOpportunity(models.Opportunity, testCustomer.id, testUser.id, {
         name: '赢单测试机会',
         stage: 'negotiation',
         status: 'open'
       });
 
       const response = await request(app)
-        .put(`/api/opportunities/${oppForWin.id}/win`)
+        .put(`/api/opportunities/${oppForWin.id}/won`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           actual_amount: 120000,
@@ -271,14 +251,14 @@ describe('Opportunity Controller - 销售机会模块测试', () => {
 
     test('应该拒绝标记已经赢单的机会', async () => {
       // 创建一个已经赢单的销售机会
-      const wonOpp = await createTestOpportunity(OpportunityModel, testCustomer.id, testUser.id, {
+      const wonOpp = await createTestOpportunity(models.Opportunity, testCustomer.id, testUser.id, {
         name: '已赢单机会',
         status: 'won',
         stage: 'closed_won'
       });
 
       const response = await request(app)
-        .put(`/api/opportunities/${wonOpp.id}/win`)
+        .put(`/api/opportunities/${wonOpp.id}/won`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           actual_amount: 100000
@@ -286,21 +266,21 @@ describe('Opportunity Controller - 销售机会模块测试', () => {
         .expect(400);
 
       expect(response.body).toHaveProperty('code', 400);
-      expect(response.body.message).toContain('已经是赢单状态');
+      expect(response.body.message).toContain('该机会已经是赢单状态');
     });
   });
 
   describe('PUT /api/opportunities/:id/lose - 标记输单', () => {
     test('应该成功标记输单', async () => {
       // 创建一个新的销售机会用于输单测试
-      const oppForLose = await createTestOpportunity(OpportunityModel, testCustomer.id, testUser.id, {
+      const oppForLose = await createTestOpportunity(models.Opportunity, testCustomer.id, testUser.id, {
         name: '输单测试机会',
         stage: 'negotiation',
         status: 'open'
       });
 
       const response = await request(app)
-        .put(`/api/opportunities/${oppForLose.id}/lose`)
+        .put(`/api/opportunities/${oppForLose.id}/lost`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           lost_reason: 'price',
@@ -312,17 +292,17 @@ describe('Opportunity Controller - 销售机会模块测试', () => {
       expect(response.body).toHaveProperty('code', 200);
       expect(response.body.data).toHaveProperty('status', 'lost');
       expect(response.body.data).toHaveProperty('stage', 'closed_lost');
-      expect(response.body.data).toHaveProperty('lost_reason', 'price');
+      expect(response.body.data).toHaveProperty('lose_reason', 'price');
     });
 
     test('应该拒绝不提供输单原因', async () => {
-      const oppForLose2 = await createTestOpportunity(OpportunityModel, testCustomer.id, testUser.id, {
+      const oppForLose2 = await createTestOpportunity(models.Opportunity, testCustomer.id, testUser.id, {
         name: '输单测试机会2',
         status: 'open'
       });
 
       const response = await request(app)
-        .put(`/api/opportunities/${oppForLose2.id}/lose`)
+        .put(`/api/opportunities/${oppForLose2.id}/lost`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           // 缺少 lost_reason
@@ -331,14 +311,14 @@ describe('Opportunity Controller - 销售机会模块测试', () => {
         .expect(400);
 
       expect(response.body).toHaveProperty('code', 400);
-      expect(response.body.message).toContain('输单原因');
+      expect(response.body.message).toContain('请选择输单原因');
     });
   });
 
   describe('DELETE /api/opportunities/:id - 删除销售机会', () => {
     test('应该成功删除销售机会', async () => {
       // 创建一个用于删除的销售机会
-      const oppToDelete = await createTestOpportunity(OpportunityModel, testCustomer.id, testUser.id, {
+      const oppToDelete = await createTestOpportunity(models.Opportunity, testCustomer.id, testUser.id, {
         name: '待删除机会'
       });
 
@@ -350,7 +330,7 @@ describe('Opportunity Controller - 销售机会模块测试', () => {
       expect(response.body).toHaveProperty('code', 200);
 
       // 验证已删除
-      const deleted = await OpportunityModel.findByPk(oppToDelete.id);
+      const deleted = await models.Opportunity.findByPk(oppToDelete.id);
       expect(deleted).toBeNull();
     });
   });

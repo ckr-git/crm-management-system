@@ -237,8 +237,6 @@ crm-system/
 | `npm run test:coverage` | 测试覆盖率报告 |
 | `npx playwright test` | 运行 Playwright E2E 测试 |
 | `npm run storybook` | 启动 Storybook 组件预览 |
-| `npx playwright test` | 运行 Playwright E2E 测试 |
-| `npm run storybook` | 启动 Storybook 组件预览 |
 
 ### 后端 (`crm-system/backend/`)
 
@@ -258,10 +256,24 @@ crm-system/
 |------|------|------|
 | 前端单元测试 | `cd crm-system/frontend && npm run test` | 运行 Vitest 单元测试 |
 | 后端测试 | `cd crm-system/backend && npm test` | 运行 Jest 单元和集成测试 |
-| E2E 测试 | `cd crm-system/frontend && npx playwright test` | 覆盖登录、客户管理等关键流程 |
+| E2E 测试 | `cd crm-system/frontend && npx playwright test` | 覆盖登录、工作台、客户、公海、商机、跟进等关键流程 |
 | 冒烟测试 | `bash crm-system/scripts/smoke-test.sh http://localhost:3000 http://localhost:5174` | 检查前后端健康状态和关键接口 |
 
+E2E 采用“实际点击验收 + 稳定路径沉淀为 Playwright 用例”的方式维护，当前覆盖：
+- 登录后进入工作台
+- 工作台统计卡片与快捷入口导航
+- 客户列表搜索、客户详情、销售机会 Tab、商机详情返回
+- 客户公海搜索、筛选入口和空状态
+- 跟进记录类型筛选与新增弹窗
+- 销售机会统计区、搜索和新增弹窗
+
 E2E 运行会生成 `playwright-report/`、`test-results/`、`blob-report/` 等报告目录，这些属于本地测试产物，已在 `.gitignore` 中忽略。
+
+### 已知测试风险
+
+- Element Plus 下拉框和弹窗的可访问性语义有限，后续 UI 改动可能让 E2E 选择器变脆；建议逐步给关键按钮、筛选器、弹窗字段补充稳定的 `data-testid` 或明确 `aria-label`。
+- E2E 依赖当前开发数据库的种子数据。若运行库未重新执行 `npm run init-db`，客户、公海、商机、跟进列表数据可能与 `init.sql` 不一致，导致深交互用例需要先校准数据状态。
+- 当前 Playwright 默认以 Chromium 为主；跨浏览器回归需要显式执行完整项目配置。
 
 ### 环境变量
 

@@ -1,5 +1,14 @@
 const { DataTypes } = require('sequelize');
 
+let customerCodeSequence = 0;
+
+const generateCustomerCode = () => {
+  customerCodeSequence += 1;
+  const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const suffix = String(customerCodeSequence).padStart(4, '0');
+  return `C${date}${suffix}`;
+};
+
 module.exports = (sequelize) => {
   const Customer = sequelize.define('Customer', {
     id: {
@@ -12,6 +21,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(20),
       allowNull: false,
       unique: true,
+      defaultValue: generateCustomerCode,
       comment: '客户编号：C+YYYYMMDD+4位流水号'
     },
     name: {

@@ -1,15 +1,16 @@
-const { createTestDatabase, syncTestDatabase, cleanTestDatabase } = require('../../helpers/testDatabase');
-const User = require('../../../src/models/User');
+const { createTestDatabase, syncTestDatabase, cleanTestDatabase, models } = require('../../helpers/testDatabase');
 const bcrypt = require('bcryptjs');
 
 describe('User Model - 用户模型单元测试', () => {
   let sequelize;
   let UserModel;
+  let testUser;
 
   beforeAll(async () => {
     sequelize = createTestDatabase();
-    UserModel = User(sequelize);
+    UserModel = models.User;
     await syncTestDatabase(sequelize);
+    await models.Role.create({ id: 1, name: '销售', code: 'sales' });
   });
 
   afterAll(async () => {
@@ -93,13 +94,15 @@ describe('User Model - 用户模型单元测试', () => {
   });
 
   describe('实例方法', () => {
-    let testUser;
+    let methodUserCounter = 0;
 
     beforeEach(async () => {
+      methodUserCounter += 1;
       testUser = await UserModel.create({
-        username: 'methodtest',
+        username: `methodtest_${methodUserCounter}`,
         password: 'password123',
         name: '方法测试',
+        email: 'method@example.com',
         role_id: 1
       });
     });

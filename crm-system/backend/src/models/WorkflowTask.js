@@ -61,15 +61,15 @@ module.exports = (sequelize) => {
     comment: '工作流任务表',
     indexes: [
       {
-        name: 'idx_instance_id',
+        name: 'idx_workflow_tasks_instance_id',
         fields: ['instance_id']
       },
       {
-        name: 'idx_assignee_id',
+        name: 'idx_workflow_tasks_assignee_id',
         fields: ['assignee_id']
       },
       {
-        name: 'idx_status',
+        name: 'idx_workflow_tasks_status',
         fields: ['status']
       }
     ]

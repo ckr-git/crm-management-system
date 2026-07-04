@@ -1,23 +1,11 @@
-const { Sequelize } = require('sequelize');
+const { sequelize, models } = require('../../src/models');
 
 /**
  * 创建测试数据库连接
- * 使用SQLite内存数据库，避免影响真实数据
+ * 使用应用单例Sequelize实例，确保测试数据与Express应用共享
  */
 const createTestDatabase = () => {
-  const sequelize = new Sequelize('sqlite::memory:', {
-    dialect: 'sqlite',
-    logging: false,
-    define: {
-      timestamps: true,
-      underscored: false,
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-      deletedAt: 'deleted_at',
-      paranoid: true
-    }
-  });
-
+  sequelize.__isAppTestSequelize = true;
   return sequelize;
 };
 
@@ -33,7 +21,10 @@ const syncTestDatabase = async (sequelize) => {
  */
 const cleanTestDatabase = async (sequelize) => {
   await sequelize.drop();
-  await sequelize.close();
+
+  if (!sequelize.__isAppTestSequelize) {
+    await sequelize.close();
+  }
 };
 
 /**
@@ -91,5 +82,6 @@ module.exports = {
   cleanTestDatabase,
   createTestUser,
   createTestCustomer,
-  createTestOpportunity
+  createTestOpportunity,
+  models
 };

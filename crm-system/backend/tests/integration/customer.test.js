@@ -1,15 +1,9 @@
 const request = require('supertest');
 const app = require('../../src/app');
-const { createTestDatabase, syncTestDatabase, cleanTestDatabase, createTestUser, createTestCustomer } = require('../helpers/testDatabase');
-const Customer = require('../../src/models/Customer');
-const User = require('../../src/models/User');
-const Role = require('../../src/models/Role');
+const { createTestDatabase, syncTestDatabase, cleanTestDatabase, createTestUser, createTestCustomer, models } = require('../helpers/testDatabase');
 
 describe('Customer Controller - 客户管理模块测试', () => {
   let sequelize;
-  let CustomerModel;
-  let UserModel;
-  let RoleModel;
   let testUser;
   let token;
   let testCustomer;
@@ -17,19 +11,11 @@ describe('Customer Controller - 客户管理模块测试', () => {
   beforeAll(async () => {
     // 创建测试数据库
     sequelize = createTestDatabase();
-    CustomerModel = Customer(sequelize);
-    UserModel = User(sequelize);
-    RoleModel = Role(sequelize);
-
-    // 建立模型关联
-    CustomerModel.belongsTo(UserModel, { foreignKey: 'owner_id', as: 'owner' });
-    UserModel.hasMany(CustomerModel, { foreignKey: 'owner_id', as: 'customers' });
-    UserModel.belongsTo(RoleModel, { foreignKey: 'role_id', as: 'role' });
 
     await syncTestDatabase(sequelize);
 
     // 创建测试角色
-    const testRole = await RoleModel.create({
+    const testRole = await models.Role.create({
       id: 1,
       name: '销售',
       code: 'sales',
@@ -37,7 +23,7 @@ describe('Customer Controller - 客户管理模块测试', () => {
     });
 
     // 创建测试用户并获取token
-    testUser = await createTestUser(UserModel, {
+    testUser = await createTestUser(models.User, {
       username: 'salesuser',
       password: 'test123456',
       role_id: testRole.id
@@ -54,7 +40,7 @@ describe('Customer Controller - 客户管理模块测试', () => {
     token = loginResponse.body.data.token;
 
     // 创建测试客户
-    testCustomer = await createTestCustomer(CustomerModel, testUser.id);
+    testCustomer = await createTestCustomer(models.Customer, testUser.id);
   });
 
   afterAll(async () => {
@@ -133,7 +119,7 @@ describe('Customer Controller - 客户管理模块测试', () => {
         .send(invalidCustomer)
         .expect(400);
 
-      expect(response.body).toHaveProperty('code', 400);
+      expect(response.body).toHaveProperty('code', 1001);
     });
 
     test('应该拒绝手机号格式错误', async () => {
@@ -150,7 +136,7 @@ describe('Customer Controller - 客户管理模块测试', () => {
         .send(invalidCustomer)
         .expect(400);
 
-      expect(response.body).toHaveProperty('code', 400);
+      expect(response.body).toHaveProperty('code', 1001);
     });
   });
 
@@ -210,7 +196,7 @@ describe('Customer Controller - 客户管理模块测试', () => {
   describe('DELETE /api/customers/:id - 删除客户', () => {
     test('应该成功删除客户（软删除）', async () => {
       // 先创建一个用于删除的客户
-      const customerToDelete = await createTestCustomer(CustomerModel, testUser.id, {
+      const customerToDelete = await createTestCustomer(models.Customer, testUser.id, {
         name: '待删除客户',
         phone: '13900139001'
       });
@@ -224,7 +210,7 @@ describe('Customer Controller - 客户管理模块测试', () => {
       expect(response.body).toHaveProperty('message', '删除成功');
 
       // 验证客户已被软删除
-      const deletedCustomer = await CustomerModel.findByPk(customerToDelete.id);
+      const deletedCustomer = await models.Customer.findByPk(customerToDelete.id);
       expect(deletedCustomer).toBeNull();
     });
 
@@ -241,11 +227,11 @@ describe('Customer Controller - 客户管理模块测试', () => {
   describe('POST /api/customers/batch-delete - 批量删除客户', () => {
     test('应该成功批量删除客户', async () => {
       // 创建两个客户用于批量删除
-      const customer1 = await createTestCustomer(CustomerModel, testUser.id, {
+      const customer1 = await createTestCustomer(models.Customer, testUser.id, {
         name: '批量删除1',
         phone: '13900139002'
       });
-      const customer2 = await createTestCustomer(CustomerModel, testUser.id, {
+      const customer2 = await createTestCustomer(models.Customer, testUser.id, {
         name: '批量删除2',
         phone: '13900139003'
       });
@@ -253,7 +239,7 @@ describe('Customer Controller - 客户管理模块测试', () => {
       const response = await request(app)
         .post('/api/customers/batch-delete')
         .set('Authorization', `Bearer ${token}`)
-        .send({ ids: [customer1.id, customer2.id] })
+        .send({ customer_ids: [customer1.id, customer2.id], ids: [customer1.id, customer2.id] })
         .expect(200);
 
       expect(response.body).toHaveProperty('code', 200);
@@ -264,10 +250,10 @@ describe('Customer Controller - 客户管理模块测试', () => {
       const response = await request(app)
         .post('/api/customers/batch-delete')
         .set('Authorization', `Bearer ${token}`)
-        .send({ ids: [] })
+        .send({ customer_ids: [], ids: [] })
         .expect(400);
 
-      expect(response.body).toHaveProperty('code', 400);
+      expect(response.body).toHaveProperty('code', 1001);
     });
   });
 
@@ -276,7 +262,7 @@ describe('Customer Controller - 客户管理模块测试', () => {
 
     beforeAll(async () => {
       // 创建另一个用户用于转移测试
-      anotherUser = await createTestUser(UserModel, {
+      anotherUser = await createTestUser(models.User, {
         username: 'anotheruser',
         password: 'test123456',
         name: '另一个用户',
@@ -300,8 +286,13 @@ describe('Customer Controller - 客户管理模块测试', () => {
     });
 
     test('应该拒绝转移给不存在的用户', async () => {
+      const ownedCustomer = await createTestCustomer(models.Customer, testUser.id, {
+        name: '待测试转移客户',
+        phone: '13900139009'
+      });
+
       const response = await request(app)
-        .post(`/api/customers/${testCustomer.id}/transfer`)
+        .post(`/api/customers/${ownedCustomer.id}/transfer`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           to_user_id: 99999,

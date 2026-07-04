@@ -106,19 +106,19 @@ module.exports = (sequelize) => {
     comment: '销售机会表',
     indexes: [
       {
-        name: 'idx_customer_id',
+        name: 'idx_opportunities_customer_id',
         fields: ['customer_id']
       },
       {
-        name: 'idx_owner_id',
+        name: 'idx_opportunities_owner_id',
         fields: ['owner_id']
       },
       {
-        name: 'idx_stage',
+        name: 'idx_opportunities_stage',
         fields: ['stage']
       },
       {
-        name: 'idx_status',
+        name: 'idx_opportunities_status',
         fields: ['status']
       }
     ]

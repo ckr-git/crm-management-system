@@ -60,11 +60,11 @@ module.exports = (sequelize) => {
     comment: '销售机会阶段历史表',
     indexes: [
       {
-        name: 'idx_opportunity_id',
+        name: 'idx_opportunity_stage_history_opportunity_id',
         fields: ['opportunity_id']
       },
       {
-        name: 'idx_created_at',
+        name: 'idx_opportunity_stage_history_created_at',
         fields: ['created_at']
       }
     ]

@@ -71,19 +71,19 @@ module.exports = (sequelize) => {
     comment: '消息通知表',
     indexes: [
       {
-        name: 'idx_user_id',
+        name: 'idx_notifications_user_id',
         fields: ['user_id']
       },
       {
-        name: 'idx_type',
+        name: 'idx_notifications_type',
         fields: ['type']
       },
       {
-        name: 'idx_is_read',
+        name: 'idx_notifications_is_read',
         fields: ['is_read']
       },
       {
-        name: 'idx_created_at',
+        name: 'idx_notifications_created_at',
         fields: ['created_at']
       }
     ]

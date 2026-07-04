@@ -65,15 +65,15 @@ module.exports = (sequelize) => {
     comment: '客户公海池表',
     indexes: [
       {
-        name: 'idx_customer_id',
+        name: 'idx_customer_pool_customer_id',
         fields: ['customer_id']
       },
       {
-        name: 'idx_status',
+        name: 'idx_customer_pool_status',
         fields: ['status']
       },
       {
-        name: 'idx_enter_at',
+        name: 'idx_customer_pool_enter_at',
         fields: ['enter_at']
       }
     ]

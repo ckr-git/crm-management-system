@@ -1,30 +1,20 @@
 const request = require('supertest');
 const app = require('../../src/app');
-const { createTestDatabase, syncTestDatabase, cleanTestDatabase, createTestUser } = require('../helpers/testDatabase');
-const User = require('../../src/models/User');
-const Role = require('../../src/models/Role');
+const { createTestDatabase, syncTestDatabase, cleanTestDatabase, createTestUser, models } = require('../helpers/testDatabase');
 
 describe('Auth Controller - 认证模块测试', () => {
   let sequelize;
-  let UserModel;
-  let RoleModel;
   let testUser;
   let token;
 
   beforeAll(async () => {
     // 创建测试数据库
     sequelize = createTestDatabase();
-    UserModel = User(sequelize);
-    RoleModel = Role(sequelize);
-
-    // 建立模型关联
-    UserModel.belongsTo(RoleModel, { foreignKey: 'role_id', as: 'role' });
-    RoleModel.hasMany(UserModel, { foreignKey: 'role_id', as: 'users' });
 
     await syncTestDatabase(sequelize);
 
     // 创建测试角色
-    const testRole = await RoleModel.create({
+    const testRole = await models.Role.create({
       id: 1,
       name: '管理员',
       code: 'admin',
@@ -32,7 +22,7 @@ describe('Auth Controller - 认证模块测试', () => {
     });
 
     // 创建测试用户
-    testUser = await createTestUser(UserModel, {
+    testUser = await createTestUser(models.User, {
       username: 'admin',
       password: 'admin123',
       role_id: testRole.id
@@ -115,7 +105,7 @@ describe('Auth Controller - 认证模块测试', () => {
 
     test('应该拒绝被禁用的用户', async () => {
       // 创建一个被禁用的用户
-      const disabledUser = await createTestUser(UserModel, {
+      const disabledUser = await createTestUser(models.User, {
         username: 'disabled',
         password: 'test123456',
         role_id: 1,

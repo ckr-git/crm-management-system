@@ -116,6 +116,7 @@ CREATE TABLE `users` (
 -- 2.1 客户表
 CREATE TABLE `customers` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '客户ID',
+  `code` VARCHAR(20) NOT NULL COMMENT '客户编号：C+YYYYMMDD+4位流水号',
   `name` VARCHAR(100) NOT NULL COMMENT '公司名称',
   `short_name` VARCHAR(50) DEFAULT NULL COMMENT '公司简称',
   `credit_code` VARCHAR(50) DEFAULT NULL COMMENT '统一社会信用代码',
@@ -143,6 +144,7 @@ CREATE TABLE `customers` (
   `deleted_at` DATETIME DEFAULT NULL COMMENT '删除时间',
   
   INDEX `idx_name` (`name`),
+  UNIQUE KEY `uk_code` (`code`),
   INDEX `idx_phone` (`phone`),
   INDEX `idx_owner_id` (`owner_id`),
   INDEX `idx_source` (`source`),
@@ -465,7 +467,7 @@ INSERT INTO `roles` (`name`, `code`, `description`, `is_system`, `status`) VALUE
 
 -- 6.2 初始化管理员账号（密码：admin123，已BCrypt加密）
 INSERT INTO `users` (`username`, `password`, `name`, `email`, `phone`, `role_id`, `status`) VALUES
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', '系统管理员', 'admin@crm.com', '13800138000', 1, 1);
+('admin', '$2b$10$O.Gjn/R0WkP8E4O2fXpCKuka32gSL5arTXvdVY/QNXPfSZhrpxhHS', '系统管理员', 'admin@crm.com', '13800138000', 1, 1);
 
 -- 6.3 初始化字典数据
 
@@ -562,22 +564,22 @@ INSERT INTO `users` (`id`, `username`, `password`, `name`, `email`, `phone`, `ro
 (6, 'sales04', '$2b$10$LfLyY8wO4ot/wb7ytlWiyeDewnN.Xqid6wlh3V88zd3p82nGdRsQy', '陈静', 'chenjing@crm.com', '13900139005', 3, 2, 1);
 
 -- 8.3 初始化客户数据（覆盖多个行业、来源、阶段、等级）
-INSERT INTO `customers` (`id`, `name`, `contact`, `phone`, `email`, `industry`, `company_size`, `source`, `level`, `stage`, `owner_id`, `address`, `last_followup_at`, `created_at`) VALUES
-(1, '北京云智科技有限公司', '刘总', '010-88881001', 'liu@yunzhi.com', 'it', '101-500', 'website', 'vip', 'deal', 3, '北京市海淀区中关村大街1号', '2025-01-10 10:00:00', '2024-10-01 09:00:00'),
-(2, '上海精密制造集团', '陈工', '021-66661002', 'chen@jingmi.com', 'manufacturing', '500+', 'exhibition', 'important', 'deal', 3, '上海市浦东新区张江路88号', '2025-01-08 14:00:00', '2024-09-15 10:00:00'),
-(3, '深圳前海金融服务公司', '王经理', '0755-33331003', 'wang@qianhai.com', 'finance', '51-100', 'referral', 'vip', 'negotiation', 4, '深圳市南山区前海路100号', '2025-01-12 09:30:00', '2024-11-01 08:00:00'),
-(4, '杭州智慧教育科技', '赵老师', '0571-88881004', 'zhao@zhihui.com', 'education', '21-50', 'phone', 'normal', 'quotation', 4, '杭州市西湖区文三路200号', '2025-01-05 16:00:00', '2024-11-20 11:00:00'),
-(5, '广州康健医疗器械', '孙院长', '020-88881005', 'sun@kangjian.com', 'healthcare', '101-500', 'advertisement', 'important', 'deal', 5, '广州市天河区天河路300号', '2025-01-11 11:00:00', '2024-08-10 09:00:00'),
-(6, '成都天府地产开发', '周总', '028-88881006', 'zhou@tianfu.com', 'realestate', '500+', 'referral', 'vip', 'deal', 5, '成都市高新区天府大道500号', '2025-01-09 15:00:00', '2024-07-20 10:00:00'),
-(7, '南京创新软件公司', '吴总监', '025-88881007', 'wu@chuangxin.com', 'it', '51-100', 'website', 'important', 'intention', 3, '南京市雨花台区软件大道50号', '2025-01-13 10:00:00', '2024-12-01 09:00:00'),
-(8, '武汉光谷生物医药', '郑博士', '027-88881008', 'zheng@guanggu.com', 'healthcare', '21-50', 'exhibition', 'normal', 'potential', 4, '武汉市东湖高新区光谷大道70号', '2025-01-06 14:00:00', '2024-12-15 11:00:00'),
-(9, '重庆山城机械制造', '钱厂长', '023-88881009', 'qian@shancheng.com', 'manufacturing', '101-500', 'phone', 'important', 'negotiation', 6, '重庆市渝北区龙溪路80号', '2025-01-14 09:00:00', '2024-10-20 08:00:00'),
-(10, '天津滨海金融投资', '孙总', '022-88881010', 'sun@binhai.com', 'finance', '21-50', 'advertisement', 'normal', 'quotation', 6, '天津市滨海新区响螺湾60号', '2025-01-07 16:00:00', '2024-11-10 10:00:00'),
-(11, '西安丝路教育集团', '马校长', '029-88881011', 'ma@silu.com', 'education', '500+', 'referral', 'vip', 'deal', 3, '西安市雁塔区科技路90号', '2025-01-15 10:00:00', '2024-06-15 09:00:00'),
-(12, '苏州工业园区智造', '黄工', '0512-88881012', 'huang@zhizao.com', 'manufacturing', '101-500', 'exhibition', 'important', 'deal', 4, '苏州市工业园区星湖街100号', '2025-01-10 13:00:00', '2024-09-01 10:00:00'),
-(13, '厦门海峡信息技术', '林总', '0592-88881013', 'lin@haixia.com', 'it', '21-50', 'website', 'normal', 'intention', 5, '厦门市思明区软件园二期', '2025-01-04 11:00:00', '2024-12-20 14:00:00'),
-(14, '长沙麓谷健康科技', '谢总', '0731-88881014', 'xie@lugu.com', 'healthcare', '51-100', 'phone', 'normal', 'potential', 6, '长沙市岳麓区麓谷大道120号', '2025-01-03 15:00:00', '2025-01-02 09:00:00'),
-(15, '青岛海信地产集团', '冯总', '0532-88881015', 'feng@haixin.com', 'realestate', '500+', 'advertisement', 'important', 'negotiation', 3, '青岛市崂山区海尔路150号', '2025-01-16 09:00:00', '2024-08-25 10:00:00');
+INSERT INTO `customers` (`id`, `code`, `name`, `contact`, `phone`, `email`, `industry`, `company_size`, `source`, `level`, `stage`, `owner_id`, `address`, `last_followup_at`, `created_at`) VALUES
+(1, 'C202501010001', '北京云智科技有限公司', '刘总', '010-88881001', 'liu@yunzhi.com', 'it', '101-500', 'website', 'vip', 'deal', 3, '北京市海淀区中关村大街1号', '2025-01-10 10:00:00', '2024-10-01 09:00:00'),
+(2, 'C202501020002', '上海精密制造集团', '陈工', '021-66661002', 'chen@jingmi.com', 'manufacturing', '500+', 'exhibition', 'important', 'deal', 3, '上海市浦东新区张江路88号', '2025-01-08 14:00:00', '2024-09-15 10:00:00'),
+(3, 'C202501030003', '深圳前海金融服务公司', '王经理', '0755-33331003', 'wang@qianhai.com', 'finance', '51-100', 'referral', 'vip', 'negotiation', 4, '深圳市南山区前海路100号', '2025-01-12 09:30:00', '2024-11-01 08:00:00'),
+(4, 'C202501040004', '杭州智慧教育科技', '赵老师', '0571-88881004', 'zhao@zhihui.com', 'education', '21-50', 'phone', 'normal', 'quotation', 4, '杭州市西湖区文三路200号', '2025-01-05 16:00:00', '2024-11-20 11:00:00'),
+(5, 'C202501050005', '广州康健医疗器械', '孙院长', '020-88881005', 'sun@kangjian.com', 'healthcare', '101-500', 'advertisement', 'important', 'deal', 5, '广州市天河区天河路300号', '2025-01-11 11:00:00', '2024-08-10 09:00:00'),
+(6, 'C202501060006', '成都天府地产开发', '周总', '028-88881006', 'zhou@tianfu.com', 'realestate', '500+', 'referral', 'vip', 'deal', 5, '成都市高新区天府大道500号', '2025-01-09 15:00:00', '2024-07-20 10:00:00'),
+(7, 'C202501070007', '南京创新软件公司', '吴总监', '025-88881007', 'wu@chuangxin.com', 'it', '51-100', 'website', 'important', 'intention', 3, '南京市雨花台区软件大道50号', '2025-01-13 10:00:00', '2024-12-01 09:00:00'),
+(8, 'C202501080008', '武汉光谷生物医药', '郑博士', '027-88881008', 'zheng@guanggu.com', 'healthcare', '21-50', 'exhibition', 'normal', 'potential', 4, '武汉市东湖高新区光谷大道70号', '2025-01-06 14:00:00', '2024-12-15 11:00:00'),
+(9, 'C202501090009', '重庆山城机械制造', '钱厂长', '023-88881009', 'qian@shancheng.com', 'manufacturing', '101-500', 'phone', 'important', 'negotiation', 6, '重庆市渝北区龙溪路80号', '2025-01-14 09:00:00', '2024-10-20 08:00:00'),
+(10, 'C202501100010', '天津滨海金融投资', '孙总', '022-88881010', 'sun@binhai.com', 'finance', '21-50', 'advertisement', 'normal', 'quotation', 6, '天津市滨海新区响螺湾60号', '2025-01-07 16:00:00', '2024-11-10 10:00:00'),
+(11, 'C202501110011', '西安丝路教育集团', '马校长', '029-88881011', 'ma@silu.com', 'education', '500+', 'referral', 'vip', 'deal', 3, '西安市雁塔区科技路90号', '2025-01-15 10:00:00', '2024-06-15 09:00:00'),
+(12, 'C202501120012', '苏州工业园区智造', '黄工', '0512-88881012', 'huang@zhizao.com', 'manufacturing', '101-500', 'exhibition', 'important', 'deal', 4, '苏州市工业园区星湖街100号', '2025-01-10 13:00:00', '2024-09-01 10:00:00'),
+(13, 'C202501130013', '厦门海峡信息技术', '林总', '0592-88881013', 'lin@haixia.com', 'it', '21-50', 'website', 'normal', 'intention', 5, '厦门市思明区软件园二期', '2025-01-04 11:00:00', '2024-12-20 14:00:00'),
+(14, 'C202501140014', '长沙麓谷健康科技', '谢总', '0731-88881014', 'xie@lugu.com', 'healthcare', '51-100', 'phone', 'normal', 'potential', 6, '长沙市岳麓区麓谷大道120号', '2025-01-03 15:00:00', '2025-01-02 09:00:00'),
+(15, 'C202501150015', '青岛海信地产集团', '冯总', '0532-88881015', 'feng@haixin.com', 'realestate', '500+', 'advertisement', 'important', 'negotiation', 3, '青岛市崂山区海尔路150号', '2025-01-16 09:00:00', '2024-08-25 10:00:00');
 
 -- 8.4 初始化销售机会（含成交数据，让行业分析有转化率）
 INSERT INTO `opportunities` (`id`, `customer_id`, `name`, `amount`, `stage`, `probability`, `expected_close_date`, `owner_id`, `status`, `actual_amount`, `close_date`, `created_at`) VALUES
