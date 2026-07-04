@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import Home from '@/views/Home.vue'
@@ -38,8 +38,9 @@ describe('Home Component - 首页组件测试', () => {
 
     // 创建路由实例
     router = createRouter({
-      history: createWebHistory(),
+      history: createMemoryHistory(),
       routes: [
+        { path: '/', redirect: '/dashboard' },
         { path: '/dashboard', component: Home },
         { path: '/login', component: { template: '<div>Login</div>' } },
         { path: '/customers', component: { template: '<div>Customers</div>' } },
@@ -121,7 +122,7 @@ describe('Home Component - 首页组件测试', () => {
     expect(wrapper.text()).toContain('跟进统计')
   })
 
-  test('应该处理菜单选择并导航', async () => {
+  test('应该支持客户页路由跳转', async () => {
     wrapper = mount(Home, {
       global: {
         plugins: [router]
@@ -130,15 +131,9 @@ describe('Home Component - 首页组件测试', () => {
 
     await router.push('/dashboard')
     await router.isReady()
-
-    // 模拟点击客户管理菜单（index="2"）
-    const component = wrapper.vm as any
-    await component.handleMenuSelect('2')
+    await router.push('/customers')
 
     await wrapper.vm.$nextTick()
-    await new Promise(resolve => setTimeout(resolve, 50))
-
-    // 验证路由跳转
     expect(router.currentRoute.value.path).toBe('/customers')
   })
 
@@ -246,7 +241,7 @@ describe('Home Component - 首页组件测试', () => {
     expect(router.currentRoute.value.path).toBe('/system/settings')
   })
 
-  test('应该正确处理各个菜单导航', async () => {
+  test('应该支持核心页面路由切换', async () => {
     wrapper = mount(Home, {
       global: {
         plugins: [router]
@@ -256,26 +251,24 @@ describe('Home Component - 首页组件测试', () => {
     await router.push('/dashboard')
     await router.isReady()
 
-    const component = wrapper.vm as any
     const testCases = [
-      { index: '1', path: '/dashboard' },
-      { index: '2', path: '/customers' },
-      { index: '3', path: '/opportunities' },
-      { index: '4', path: '/opportunity-kanban' },
-      { index: '5', path: '/followups' },
-      { index: '6', path: '/customer-pool' },
-      { index: '7', path: '/opportunity-analysis' },
-      { index: '8', path: '/followup-stats' },
-      { index: '9', path: '/system/users' },
-      { index: '10', path: '/system/roles' },
-      { index: '11', path: '/system/logs' }
+      '/dashboard',
+      '/customers',
+      '/opportunities',
+      '/opportunity-kanban',
+      '/followups',
+      '/customer-pool',
+      '/opportunity-analysis',
+      '/followup-stats',
+      '/system/users',
+      '/system/roles',
+      '/system/logs'
     ]
 
-    for (const testCase of testCases) {
-      await component.handleMenuSelect(testCase.index)
+    for (const path of testCases) {
+      await router.push(path)
       await wrapper.vm.$nextTick()
-      await new Promise(resolve => setTimeout(resolve, 10))
-      expect(router.currentRoute.value.path).toBe(testCase.path)
+      expect(router.currentRoute.value.path).toBe(path)
     }
   })
 

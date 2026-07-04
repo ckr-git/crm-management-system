@@ -1,6 +1,6 @@
 <template>
   <div class="settings-page">
-    <PageHeader title="系统设置" :show-back="true" back-path="/home" />
+    <PageHeader title="系统设置" :show-back="true" back-path="/dashboard" />
 
     <el-tabs v-model="activeTab">
       <el-tab-pane label="个人设置" name="user">

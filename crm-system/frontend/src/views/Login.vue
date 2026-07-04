@@ -87,7 +87,7 @@ const handleLogin = async () => {
         userStore.setUserInfo(res.data.user)
         
         ElMessage.success('登录成功')
-        router.push('/home')
+        router.push('/dashboard')
       } catch (error: any) {
         console.error('登录失败:', error)
         ElMessage({ message: error.response?.data?.message || '登录失败', type: 'error', duration: 3000 })

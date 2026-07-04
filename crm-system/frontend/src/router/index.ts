@@ -13,140 +13,30 @@ const routes = [
     component: () => import('@/views/Login.vue')
   },
   {
-    path: '/home',
-    redirect: '/dashboard'
-  },
-  {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: () => import('@/views/Dashboard.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/customers',
-    name: 'CustomerList',
-    component: () => import('@/views/customers/CustomerList.vue'),
-    meta: { 
-      requiresAuth: true,
-      permission: ['customer:read']
-    }
-  },
-  {
-    path: '/customers/:id',
-    name: 'CustomerDetail',
-    component: () => import('@/views/customers/CustomerDetail.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/followups',
-    name: 'FollowupList',
-    component: () => import('@/views/followups/FollowupList.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/followup-stats',
-    name: 'FollowupStats',
-    component: () => import('@/views/followups/FollowupStats.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/customer-pool',
-    name: 'CustomerPoolList',
-    component: () => import('@/views/customerPool/CustomerPoolList.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/opportunities',
-    name: 'OpportunityList',
-    component: () => import('@/views/opportunities/OpportunityList.vue'),
-    meta: { 
-      requiresAuth: true,
-      permission: ['opportunity:read']
-    }
-  },
-  {
-    path: '/opportunity-kanban',
-    name: 'OpportunityKanban',
-    component: () => import('@/views/opportunities/OpportunityKanban.vue'),
-    meta: { 
-      requiresAuth: true,
-      permission: ['opportunity:read']
-    }
-  },
-  {
-    path: '/opportunities/:id',
-    name: 'OpportunityDetail',
-    component: () => import('@/views/opportunities/OpportunityDetail.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/opportunity-analysis',
-    name: 'OpportunityAnalysis',
-    component: () => import('@/views/opportunities/OpportunityAnalysis.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/system/users',
-    name: 'UserList',
-    component: () => import('@/views/system/UserList.vue'),
-    meta: { 
-      requiresAuth: true,
-      permission: ['user:read']
-    }
-  },
-  {
-    path: '/system/roles',
-    name: 'RoleList',
-    component: () => import('@/views/system/RoleList.vue'),
-    meta: { 
-      requiresAuth: true,
-      permission: ['role:read']
-    }
-  },
-  {
-    path: '/system/logs',
-    name: 'OperationLogList',
-    component: () => import('@/views/system/OperationLogList.vue'),
-    meta: { 
-      requiresAuth: true,
-      permission: ['user:read', 'role:read'] // 日志查看需要管理权限
-    }
-  },
-  {
-    path: '/analysis/source',
-    name: 'SourceAnalysis',
-    component: () => import('@/views/analysis/SourceAnalysis.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/analysis/industry',
-    name: 'IndustryAnalysis',
-    component: () => import('@/views/analysis/IndustryAnalysis.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/analysis/behavior',
-    name: 'BehaviorAnalysis',
-    component: () => import('@/views/analysis/BehaviorAnalysis.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/analysis/reports',
-    name: 'ReportCenter',
-    component: () => import('@/views/analysis/ReportCenter.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/system/notifications',
-    name: 'NotificationCenter',
-    component: () => import('@/views/system/NotificationCenter.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/system/settings',
-    name: 'Settings',
-    component: () => import('@/views/system/Settings.vue'),
-    meta: { requiresAuth: true }
+    path: '/',
+    component: () => import('@/views/Home.vue'),
+    meta: { requiresAuth: true },
+    children: [
+      { path: 'dashboard', name: 'Dashboard', component: () => import('@/views/Dashboard.vue') },
+      { path: 'customers', name: 'CustomerList', component: () => import('@/views/customers/CustomerList.vue'), meta: { permission: ['customer:read'] } },
+      { path: 'customers/:id', name: 'CustomerDetail', component: () => import('@/views/customers/CustomerDetail.vue') },
+      { path: 'followups', name: 'FollowupList', component: () => import('@/views/followups/FollowupList.vue') },
+      { path: 'followup-stats', name: 'FollowupStats', component: () => import('@/views/followups/FollowupStats.vue') },
+      { path: 'customer-pool', name: 'CustomerPoolList', component: () => import('@/views/customerPool/CustomerPoolList.vue') },
+      { path: 'opportunities', name: 'OpportunityList', component: () => import('@/views/opportunities/OpportunityList.vue'), meta: { permission: ['opportunity:read'] } },
+      { path: 'opportunity-kanban', name: 'OpportunityKanban', component: () => import('@/views/opportunities/OpportunityKanban.vue'), meta: { permission: ['opportunity:read'] } },
+      { path: 'opportunities/:id', name: 'OpportunityDetail', component: () => import('@/views/opportunities/OpportunityDetail.vue') },
+      { path: 'opportunity-analysis', name: 'OpportunityAnalysis', component: () => import('@/views/opportunities/OpportunityAnalysis.vue') },
+      { path: 'system/users', name: 'UserList', component: () => import('@/views/system/UserList.vue'), meta: { permission: ['user:read'] } },
+      { path: 'system/roles', name: 'RoleList', component: () => import('@/views/system/RoleList.vue'), meta: { permission: ['role:read'] } },
+      { path: 'system/logs', name: 'OperationLogList', component: () => import('@/views/system/OperationLogList.vue'), meta: { permission: ['user:read', 'role:read'] } },
+      { path: 'analysis/source', name: 'SourceAnalysis', component: () => import('@/views/analysis/SourceAnalysis.vue') },
+      { path: 'analysis/industry', name: 'IndustryAnalysis', component: () => import('@/views/analysis/IndustryAnalysis.vue') },
+      { path: 'analysis/behavior', name: 'BehaviorAnalysis', component: () => import('@/views/analysis/BehaviorAnalysis.vue') },
+      { path: 'analysis/reports', name: 'ReportCenter', component: () => import('@/views/analysis/ReportCenter.vue') },
+      { path: 'system/notifications', name: 'NotificationCenter', component: () => import('@/views/system/NotificationCenter.vue') },
+      { path: 'system/settings', name: 'Settings', component: () => import('@/views/system/Settings.vue') },
+    ]
   }
 ]
 
@@ -160,8 +50,9 @@ router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('token')
   const userStore = useUserStore()
   
-  // 1. 检查是否需要登录
-  if (to.meta.requiresAuth && !token) {
+  // 1. 检查是否需要登录（包括父路由的 requiresAuth）
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  if (requiresAuth && !token) {
     ElMessage.warning('请先登录')
     next('/login')
     return

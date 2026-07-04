@@ -36,55 +36,55 @@
         <el-menu
           :default-active="$route.path"
           class="el-menu-vertical"
-          @select="handleMenuSelect"
+          router
         >
-          <el-menu-item index="1">
+          <el-menu-item index="/dashboard">
             <el-icon><Odometer /></el-icon>
             <span>数据概览</span>
           </el-menu-item>
-          <el-menu-item index="2">
+          <el-menu-item index="/customers">
             <el-icon><User /></el-icon>
             <span>客户管理</span>
           </el-menu-item>
-          <el-menu-item index="3">
+          <el-menu-item index="/opportunities">
             <el-icon><Opportunity /></el-icon>
             <span>商机管理</span>
           </el-menu-item>
-          <el-menu-item index="4">
+          <el-menu-item index="/opportunity-kanban">
             <el-icon><Grid /></el-icon>
             <span>商机看板</span>
           </el-menu-item>
-          <el-menu-item index="5">
+          <el-menu-item index="/followups">
             <el-icon><ChatDotRound /></el-icon>
             <span>跟进记录</span>
           </el-menu-item>
-          <el-menu-item index="6">
+          <el-menu-item index="/customer-pool">
             <el-icon><Collection /></el-icon>
             <span>客户池</span>
           </el-menu-item>
-          <el-submenu index="analysis">
+          <ElSubMenu index="analysis">
             <template #title>
               <el-icon><TrendCharts /></el-icon>
               <span>数据分析</span>
             </template>
-            <el-menu-item index="7">商机分析</el-menu-item>
-            <el-menu-item index="8">跟进统计</el-menu-item>
-            <el-menu-item index="13">来源分析</el-menu-item>
-            <el-menu-item index="14">行业分析</el-menu-item>
-            <el-menu-item index="15">行为分析</el-menu-item>
-            <el-menu-item index="16">分析报告</el-menu-item>
-          </el-submenu>
-          <el-submenu index="system">
+            <el-menu-item index="/opportunity-analysis">商机分析</el-menu-item>
+            <el-menu-item index="/followup-stats">跟进统计</el-menu-item>
+            <el-menu-item index="/analysis/source">来源分析</el-menu-item>
+            <el-menu-item index="/analysis/industry">行业分析</el-menu-item>
+            <el-menu-item index="/analysis/behavior">行为分析</el-menu-item>
+            <el-menu-item index="/analysis/reports">分析报告</el-menu-item>
+          </ElSubMenu>
+          <ElSubMenu index="system">
             <template #title>
               <el-icon><Setting /></el-icon>
               <span>系统管理</span>
             </template>
-            <el-menu-item index="9">用户管理</el-menu-item>
-            <el-menu-item index="10">角色管理</el-menu-item>
-            <el-menu-item index="11">操作日志</el-menu-item>
-            <el-menu-item index="17">消息中心</el-menu-item>
-            <el-menu-item index="12">系统设置</el-menu-item>
-          </el-submenu>
+            <el-menu-item index="/system/users">用户管理</el-menu-item>
+            <el-menu-item index="/system/roles">角色管理</el-menu-item>
+            <el-menu-item index="/system/logs">操作日志</el-menu-item>
+            <el-menu-item index="/system/notifications">消息中心</el-menu-item>
+            <el-menu-item index="/system/settings">系统设置</el-menu-item>
+          </ElSubMenu>
         </el-menu>
       </el-aside>
       
@@ -127,32 +127,6 @@ const handleCommand = (command: string) => {
   }
 }
 
-// 处理菜单选择
-const handleMenuSelect = (index: string) => {
-  const routes: Record<string, string> = {
-    '1': '/dashboard',
-    '2': '/customers',
-    '3': '/opportunities',
-    '4': '/opportunity-kanban',
-    '5': '/followups',
-    '6': '/customer-pool',
-    '7': '/opportunity-analysis',
-    '8': '/followup-stats',
-    '9': '/system/users',
-    '10': '/system/roles',
-    '11': '/system/logs',
-    '12': '/system/settings',
-    '13': '/analysis/source',
-    '14': '/analysis/industry',
-    '15': '/analysis/behavior',
-    '16': '/analysis/reports',
-    '17': '/system/notifications'
-  }
-  
-  if (routes[index]) {
-    router.push(routes[index])
-  }
-}
 </script>
 <style scoped lang="scss">
 /* 移动端布局 */

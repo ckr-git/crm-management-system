@@ -51,6 +51,13 @@ ecosystem.config.js
 coverage/
 .nyc_output/
 
+# Playwright / browser test artifacts
+.playwright-mcp/
+playwright-report/
+test-results/
+blob-report/
+playwright-sweep-results.json
+
 # Temporary files
 *.tmp
 *.temp

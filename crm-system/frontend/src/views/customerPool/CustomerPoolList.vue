@@ -124,7 +124,7 @@
           >
             <el-option label="VIP客户" value="vip" />
             <el-option label="重要客户" value="important" />
-            <el-option label="普通客户\" value="normal" />
+            <el-option label="普通客户" value="normal" />
           </el-select>
         </el-form-item>
         <el-form-item label="状态">
@@ -154,7 +154,7 @@
       <el-table
         :data="poolList"
         v-loading="loading"
-        element-loading-text="加载中..\"
+        element-loading-text="加载中..."
         style="width: 100%"
       >
         <template #empty>

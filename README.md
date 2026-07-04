@@ -23,6 +23,7 @@
 - **数据可视化**: 基于 ECharts 6 的多维度图表（来源分析、行业对比、销售绩效）
 - **Redis 可选**: Redis 不可用时自动降级为内存缓存，开发环境零依赖
 - **容器化部署**: Docker Compose 一键启动 MySQL + Redis
+- **自动化质量保障**: Vitest/Jest 单元与集成测试、Playwright E2E、Storybook 组件预览
 - **完整种子数据**: 15个客户、14个销售机会、22条跟进记录，覆盖6个行业
 
 ---
@@ -77,6 +78,8 @@
 | Axios | 1.12 | HTTP 客户端 |
 | Vite | 7.1 | 构建工具 |
 | Vitest | 1.6 | 单元测试 |
+| Playwright | 1.56 | E2E 测试 |
+| Storybook | 9.1 | 组件预览和交互文档 |
 | SCSS | - | 样式预处理 |
 
 ### 后端
@@ -193,8 +196,8 @@ crm-system/
 │   │       ├── dashboard/     # 仪表盘
 │   │       ├── opportunity/   # 销售机会页面
 │   │       ├── system/        # 系统管理页面
-│   │       └── workflow/      # 工作流页面
-│   └── tests/                 # 测试文件
+│   ├── tests/                 # 单元测试和 E2E 测试
+│   └── playwright.config.ts    # Playwright E2E 配置
 │
 ├── backend/                    # 后端项目 (Express 5 + Sequelize)
 │   ├── src/
@@ -232,6 +235,10 @@ crm-system/
 | `npm run preview` | 预览生产构建 |
 | `npm run test` | 运行单元测试 (Vitest) |
 | `npm run test:coverage` | 测试覆盖率报告 |
+| `npx playwright test` | 运行 Playwright E2E 测试 |
+| `npm run storybook` | 启动 Storybook 组件预览 |
+| `npx playwright test` | 运行 Playwright E2E 测试 |
+| `npm run storybook` | 启动 Storybook 组件预览 |
 
 ### 后端 (`crm-system/backend/`)
 
@@ -244,6 +251,17 @@ crm-system/
 | `npm run seed` | 填充客户种子数据 |
 | `npm test` | 运行测试 (Jest + 覆盖率) |
 | `npm run test:integration` | 仅运行集成测试 |
+
+### 质量检查
+
+| 场景 | 命令 | 说明 |
+|------|------|------|
+| 前端单元测试 | `cd crm-system/frontend && npm run test` | 运行 Vitest 单元测试 |
+| 后端测试 | `cd crm-system/backend && npm test` | 运行 Jest 单元和集成测试 |
+| E2E 测试 | `cd crm-system/frontend && npx playwright test` | 覆盖登录、客户管理等关键流程 |
+| 冒烟测试 | `bash crm-system/scripts/smoke-test.sh http://localhost:3000 http://localhost:5174` | 检查前后端健康状态和关键接口 |
+
+E2E 运行会生成 `playwright-report/`、`test-results/`、`blob-report/` 等报告目录，这些属于本地测试产物，已在 `.gitignore` 中忽略。
 
 ### 环境变量
 

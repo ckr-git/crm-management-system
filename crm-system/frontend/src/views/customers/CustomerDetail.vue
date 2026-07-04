@@ -136,6 +136,13 @@
       :customer-id="customerId"
       @success="handleFollowupSuccess"
     />
+
+    <CustomerForm
+      :visible="editFormVisible"
+      :customer-id="customerId"
+      @close="editFormVisible = false"
+      @success="handleEditSuccess"
+    />
   </div>
 </template>
 
@@ -145,6 +152,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import PageHeader from '@/components/common/PageHeader.vue'
 import QuickFollowupDialog from '@/components/QuickFollowupDialog.vue'
+import CustomerForm from '@/views/customers/CustomerForm.vue'
 import { getCustomerDetail } from '@/api/customer'
 import { getFollowupList } from '@/api/followup'
 import { getOpportunityList } from '@/api/opportunity'
@@ -170,6 +178,9 @@ const opportunitiesLoading = ref(false)
 
 // 快速跟进
 const quickFollowupVisible = ref(false)
+
+// 编辑表单
+const editFormVisible = ref(false)
 
 // 加载客户详情
 const loadCustomerDetail = async () => {
@@ -205,7 +216,12 @@ const loadFollowups = async () => {
 
 // 编辑
 const handleEdit = () => {
-  ElMessage.info('编辑功能开发中...')
+  editFormVisible.value = true
+}
+
+// 编辑成功回调
+const handleEditSuccess = () => {
+  loadCustomerDetail()
 }
 
 // 快速跟进

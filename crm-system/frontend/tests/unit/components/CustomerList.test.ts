@@ -438,9 +438,9 @@ describe('CustomerList Component - 客户列表组件测试', () => {
     wrapper = mountComponent()
     const component = wrapper.vm
 
-    expect(component.getLevelLabel('normal')).toBe('普通')
-    expect(component.getLevelLabel('important')).toBe('重要')
-    expect(component.getLevelLabel('vip')).toBe('VIP')
+    expect(component.getLevelLabel('normal')).toBe('普通客户')
+    expect(component.getLevelLabel('important')).toBe('重要客户')
+    expect(component.getLevelLabel('vip')).toBe('VIP客户')
   })
 
   test('应该在未选择客户时提示批量删除', async () => {

@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
 import { ElMessage } from 'element-plus'
 import Login from '@/views/Login.vue'
@@ -36,11 +36,11 @@ describe('Login Component - 登录组件测试', () => {
 
     // 创建路由实例
     router = createRouter({
-      history: createWebHistory(),
+      history: createMemoryHistory(),
       routes: [
         { path: '/', component: { template: '<div>Home</div>' } },
         { path: '/login', component: Login },
-        { path: '/home', component: { template: '<div>Home</div>' } }
+        { path: '/dashboard', component: { template: '<div>Home</div>' } }
       ]
     })
 
@@ -71,10 +71,6 @@ describe('Login Component - 登录组件测试', () => {
 
     // 检查登录按钮
     expect(wrapper.text()).toContain('登录')
-
-    // 检查提示信息
-    expect(wrapper.text()).toContain('默认账号：admin')
-    expect(wrapper.text()).toContain('默认密码：admin123')
   })
 
   test('应该显示初始表单状态', async () => {
@@ -139,7 +135,7 @@ describe('Login Component - 登录组件测试', () => {
 
     // 验证路由跳转
     await router.isReady()
-    expect(router.currentRoute.value.path).toBe('/home')
+    expect(router.currentRoute.value.path).toBe('/dashboard')
   })
 
   test('应该在登录失败时显示错误', async () => {

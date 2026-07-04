@@ -33,7 +33,7 @@
             class="mobile-menu-list"
             @select="handleMenuSelect"
           >
-            <el-menu-item index="/home">
+            <el-menu-item index="/dashboard">
               <el-icon><HomeFilled /></el-icon>
               <span>首页</span>
             </el-menu-item>
@@ -53,21 +53,21 @@
               <el-icon><Management /></el-icon>
               <span>客户池</span>
             </el-menu-item>
-            <el-submenu index="analysis">
+            <ElSubMenu index="analysis">
               <template #title>
                 <el-icon><DataAnalysis /></el-icon>
                 <span>数据分析</span>
               </template>
               <el-menu-item index="/opportunity-analysis">商机分析</el-menu-item>
               <el-menu-item index="/followup-stats">跟进统计</el-menu-item>
-            </el-submenu>
-            <el-submenu index="system">
+            </ElSubMenu>
+            <ElSubMenu index="system">
               <template #title>
                 <el-icon><Setting /></el-icon>
                 <span>系统设置</span>
               </template>
               <el-menu-item index="/system/settings">个人设置</el-menu-item>
-            </el-submenu>
+            </ElSubMenu>
           </el-menu>
         </div>
       </div>
@@ -111,12 +111,12 @@ const userStore = useUserStore()
 
 const menuVisible = ref(false)
 const activeMenu = computed(() => route.path)
-const activeTab = ref('/home')
+const activeTab = computed(() => route.path)
 
 const userName = computed(() => userStore.userInfo?.name || userStore.userInfo?.username || '用户')
 
 const tabs = [
-  { path: '/home', label: '首页', icon: HomeFilled },
+  { path: '/dashboard', label: '首页', icon: HomeFilled },
   { path: '/customers', label: '客户', icon: User },
   { path: '/opportunities', label: '机会', icon: TrendCharts },
   { path: '/followups', label: '跟进', icon: ChatDotRound }
@@ -132,7 +132,6 @@ const handleMenuSelect = (path: string) => {
 }
 
 const handleTabClick = (path: string) => {
-  activeTab.value = path
   router.push(path)
 }
 
